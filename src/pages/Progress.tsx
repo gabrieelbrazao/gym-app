@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import { Trophy } from 'lucide-react'
 import { t } from '../i18n'
 import { formatDate } from '../lib/formatDate'
+import FatigueMonitor from '../components/FatigueMonitor'
 
 interface PersonalRecord {
   exerciseName: string
@@ -65,6 +66,8 @@ export default function Progress() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="font-display text-4xl">{t('progress.title')}</h1>
+
+      <FatigueMonitor />
 
       {volumeData.length > 1 && (
         <div className="rounded-lg border border-border bg-bg-card p-4">

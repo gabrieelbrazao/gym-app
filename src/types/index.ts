@@ -68,3 +68,12 @@ export interface WorkoutSession {
 }
 
 export type MuscleStatus = 'untrained' | 'trained-this-week' | 'trained-today'
+
+export type FatigueStatus = 'ready' | 'resting' | 'fatigued'
+
+export interface MuscleFatigue {
+  muscleGroup: MuscleGroup
+  lastTrainedDate: string | null
+  daysAgo: number | null
+  status: FatigueStatus
+}
