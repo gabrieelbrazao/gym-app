@@ -89,6 +89,16 @@ export const ptBR: Record<string, string> = {
   'muscle.core': 'Core',
   'muscle.cardio': 'Cardio',
 
+  // Stats / Insights
+  'stats.currentStreak': 'Sequência Atual',
+  'stats.bestStreak':    'Melhor Sequência',
+  'stats.days':          'dias',
+  'stats.totalWorkouts': 'Total de Treinos',
+  'stats.avgPerWeek':    'Média / Semana',
+  'stats.mostTrained':   'Mais Treinado',
+  'stats.calendar':      'Calendário de Treinos',
+  'stats.none':          '—',
+
   // Fatigue Monitor
   'fatigue.title': 'Monitor de Fadiga',
   'fatigue.ready': 'Pronto',
