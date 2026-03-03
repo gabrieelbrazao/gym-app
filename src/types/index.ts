@@ -1,0 +1,70 @@
+export const MUSCLE_GROUPS = [
+  'chest',
+  'back',
+  'shoulders',
+  'biceps',
+  'triceps',
+  'quads',
+  'hamstrings',
+  'glutes',
+  'calves',
+  'core',
+  'cardio',
+] as const
+
+export type MuscleGroup = (typeof MUSCLE_GROUPS)[number]
+
+export const EQUIPMENT_TYPES = [
+  'barbell',
+  'dumbbell',
+  'machine',
+  'cable',
+  'bodyweight',
+  'kettlebell',
+  'band',
+] as const
+
+export type Equipment = (typeof EQUIPMENT_TYPES)[number]
+
+export interface Exercise {
+  id: string
+  name: string
+  muscleGroup: MuscleGroup
+  equipment: Equipment
+  description: string
+}
+
+export interface RoutineExercise {
+  exerciseId: string
+  sets: number
+  reps: number
+  restSeconds: number
+}
+
+export interface Routine {
+  id: string
+  name: string
+  exercises: RoutineExercise[]
+  createdAt: string
+}
+
+export interface SetLog {
+  reps: number
+  weight: number
+  completed: boolean
+}
+
+export interface WorkoutEntry {
+  exerciseId: string
+  sets: SetLog[]
+}
+
+export interface WorkoutSession {
+  id: string
+  routineId?: string
+  date: string
+  status: 'in-progress' | 'completed'
+  entries: WorkoutEntry[]
+}
+
+export type MuscleStatus = 'untrained' | 'trained-this-week' | 'trained-today'

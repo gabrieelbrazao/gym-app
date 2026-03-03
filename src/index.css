@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-primary: #0A0A0F;
+  --color-bg-card: #14141F;
+  --color-bg-input: #1C1C2A;
+  --color-text-primary: #F0F0F5;
+  --color-text-secondary: #8888A0;
+  --color-accent: #00E676;
+  --color-accent-warm: #FF5252;
+  --color-accent-blue: #448AFF;
+  --color-muscle-untrained: #2A2A3A;
+  --color-muscle-week: #00E676;
+  --color-muscle-today: #FF5252;
+  --color-border: #2A2A3A;
+
+  --font-display: "Bebas Neue", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
