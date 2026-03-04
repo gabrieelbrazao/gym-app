@@ -111,6 +111,10 @@ export const ptBR: Record<string, string> = {
   'fatigue.yesterday': 'Ontem',
   'fatigue.daysAgo': 'dias atrás',
 
+  // Timer
+  'timer.rest': 'Descanso',
+  'timer.skip': 'Pular',
+
   // Week Schedule
   'schedule.title': 'Plano Semanal',
   'schedule.rest': 'Descanso',

@@ -4,12 +4,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useWorkoutStore } from '../stores/useWorkoutStore'
 import { useHistoryStore } from '../stores/useHistoryStore'
 import { useRoutineStore } from '../stores/useRoutineStore'
+import { useStopwatch } from '../hooks/useStopwatch'
+import { useRestTimer } from '../hooks/useRestTimer'
 import { exercises as exerciseDb } from '../data/exercises'
 import SetInput from '../components/SetInput'
 import ExercisePicker from '../components/ExercisePicker'
+import RestTimer from '../components/RestTimer'
 import { Plus, CheckCircle, Dumbbell } from 'lucide-react'
-import type { Exercise } from '../types'
+import type { Exercise, SetLog } from '../types'
 import { t } from '../i18n'
+
+function formatTime(s: number) {
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+}
 
 export default function ActiveWorkout() {
   const navigate = useNavigate()
@@ -18,6 +25,8 @@ export default function ActiveWorkout() {
   const { saveSession } = useHistoryStore()
   const { routines } = useRoutineStore()
   const [showPicker, setShowPicker] = useState(false)
+  const elapsed = useStopwatch(!!session)
+  const restTimer = useRestTimer()
 
   useEffect(() => {
     cancelWorkout()
@@ -30,6 +39,11 @@ export default function ActiveWorkout() {
 
   const getExerciseName = (exerciseId: string) =>
     exerciseDb.find((e) => e.id === exerciseId)?.name ?? exerciseId
+
+  const handleSetChange = (ei: number, si: number, data: Partial<SetLog>) => {
+    updateSet(ei, si, data)
+    if (data.completed === true) restTimer.start()
+  }
 
   const handleAddExercise = (exercise: Exercise) => {
     addExercise(exercise.id)
@@ -87,7 +101,10 @@ export default function ActiveWorkout() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-4xl">{t('workout.title')}</h1>
+        <div>
+          <h1 className="font-display text-4xl">{t('workout.title')}</h1>
+          <p className="mt-0.5 font-mono text-sm text-text-secondary">{formatTime(elapsed)}</p>
+        </div>
         <motion.button
           onClick={handleFinish}
           className="flex items-center gap-1 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-bg-primary"
@@ -135,7 +152,7 @@ export default function ActiveWorkout() {
                       reps={s.reps}
                       weight={s.weight}
                       completed={s.completed}
-                      onChange={(data) => updateSet(entryIndex, setIndex, data)}
+                      onChange={(data) => handleSetChange(entryIndex, setIndex, data)}
                     />
                   </motion.div>
                 ))}
@@ -161,6 +178,8 @@ export default function ActiveWorkout() {
         <Plus size={16} />
         {t('workout.addExercise')}
       </motion.button>
+
+      <RestTimer timer={restTimer} />
 
       {showPicker && (
         <ExercisePicker onSelect={handleAddExercise} onClose={() => setShowPicker(false)} />
