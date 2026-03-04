@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { exercises } from '../data/exercises'
-import type { Exercise } from '../types'
+import type { Exercise, MuscleGroup } from '../types'
+import MuscleGroupFilter from './MuscleGroupFilter'
 import { X, Search } from 'lucide-react'
 import { t } from '../i18n'
 
@@ -11,10 +12,13 @@ interface ExercisePickerProps {
 
 export default function ExercisePicker({ onSelect, onClose }: ExercisePickerProps) {
   const [search, setSearch] = useState('')
+  const [selectedGroup, setSelectedGroup] = useState<MuscleGroup | null>(null)
 
-  const filtered = exercises.filter(
-    (e) => search === '' || e.name.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = exercises.filter((e) => {
+    const matchesGroup = selectedGroup === null || e.muscleGroup === selectedGroup
+    const matchesSearch = search === '' || e.name.toLowerCase().includes(search.toLowerCase())
+    return matchesGroup && matchesSearch
+  })
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50">
@@ -35,6 +39,10 @@ export default function ExercisePicker({ onSelect, onClose }: ExercisePickerProp
             onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-lg border border-border bg-bg-input py-2 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-secondary focus:border-accent focus:outline-none"
           />
+        </div>
+
+        <div className="px-4 pb-2">
+          <MuscleGroupFilter selected={selectedGroup} onSelect={setSelectedGroup} />
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 pb-4">
