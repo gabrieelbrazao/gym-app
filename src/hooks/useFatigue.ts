@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { MUSCLE_GROUPS, type MuscleGroup, type FatigueStatus, type MuscleFatigue } from '../types'
 import { useHistoryStore } from '../stores/useHistoryStore'
 import { exercises as exerciseDb } from '../data/exercises'
+import { localDateISO, diffDays } from '../lib/dateUtils'
 
 const RECOVERY_DAYS: Record<MuscleGroup, number> = {
   cardio:     1,
@@ -19,21 +20,11 @@ const RECOVERY_DAYS: Record<MuscleGroup, number> = {
 
 const STATUS_ORDER: Record<FatigueStatus, number> = { fatigued: 0, resting: 1, ready: 2 }
 
-function diffDays(dateA: string, dateB: string): number {
-  const a = new Date(dateA + 'T00:00:00')
-  const b = new Date(dateB + 'T00:00:00')
-  return Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24))
-}
-
-function todayISO(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
 export function useFatigue(): MuscleFatigue[] {
   const sessions = useHistoryStore((s) => s.sessions)
 
   return useMemo(() => {
-    const today = todayISO()
+    const today = localDateISO()
 
     const result: MuscleFatigue[] = MUSCLE_GROUPS.map((muscleGroup) => {
       // Find the most recent session date that trained this muscle

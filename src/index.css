@@ -30,3 +30,8 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* Prevent double-tap zoom delay */
+button, a, [role="button"] {
+  touch-action: manipulation;
+}

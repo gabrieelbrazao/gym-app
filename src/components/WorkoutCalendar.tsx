@@ -1,7 +1,14 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useWorkoutStats } from '../hooks/useWorkoutStats'
 import { t } from '../i18n'
+
+const calendarVariants = {
+  enter: (dir: number) => ({ x: dir * 40, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir * -40, opacity: 0 }),
+}
 
 const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
@@ -18,6 +25,7 @@ export default function WorkoutCalendar() {
   const { trainedDates } = useWorkoutStats()
   const today = new Date()
   const [current, setCurrent] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1))
+  const [direction, setDirection] = useState(0)
 
   const year = current.getFullYear()
   const month = current.getMonth()
@@ -31,9 +39,17 @@ export default function WorkoutCalendar() {
     ...Array(firstWeekday).fill(null),
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ]
+  // pad to always have 6 rows (42 cells) so height stays constant during slide transition
+  while (cells.length < 42) cells.push(null)
 
-  const prevMonth = () => setCurrent(new Date(year, month - 1, 1))
-  const nextMonth = () => setCurrent(new Date(year, month + 1, 1))
+  const prevMonth = () => {
+    setDirection(-1)
+    setCurrent(new Date(year, month - 1, 1))
+  }
+  const nextMonth = () => {
+    setDirection(1)
+    setCurrent(new Date(year, month + 1, 1))
+  }
 
   return (
     <section>
@@ -42,7 +58,7 @@ export default function WorkoutCalendar() {
       </h2>
 
       {/* Month navigation */}
-      <div className="bg-surface rounded-xl p-4">
+      <div className="bg-surface rounded-xl p-4 overflow-hidden">
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={prevMonth}
@@ -71,34 +87,44 @@ export default function WorkoutCalendar() {
           ))}
         </div>
 
-        {/* Day cells */}
-        <div className="grid grid-cols-7 gap-y-1">
-          {cells.map((day, i) => {
-            if (day === null) return <div key={`empty-${i}`} />
+        {/* Day cells — slide on month change */}
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={`${year}-${month}`}
+            className="grid grid-cols-7 gap-y-1"
+            custom={direction}
+            variants={calendarVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            {cells.map((day, i) => {
+              if (day === null) return <div key={`empty-${i}`} />
 
-            const iso = toISO(year, month, day)
-            const isTrained = trainedDates.has(iso)
-            const isToday =
-              day === today.getDate() && isCurrentMonth
+              const iso = toISO(year, month, day)
+              const isTrained = trainedDates.has(iso)
+              const isToday = day === today.getDate() && isCurrentMonth
 
-            return (
-              <div key={iso} className="flex items-center justify-center aspect-square">
-                <span
-                  className={[
-                    'flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium transition-colors',
-                    isTrained
-                      ? 'bg-accent text-bg font-bold'
-                      : isToday
-                      ? 'ring-1 ring-white/40 text-primary'
-                      : 'text-secondary',
-                  ].join(' ')}
-                >
-                  {day}
-                </span>
-              </div>
-            )
-          })}
-        </div>
+              return (
+                <div key={iso} className="flex items-center justify-center aspect-square">
+                  <span
+                    className={[
+                      'flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium transition-colors',
+                      isTrained
+                        ? 'bg-accent text-bg-primary font-bold'
+                        : isToday
+                        ? 'ring-1 ring-white/40 text-primary'
+                        : 'text-secondary',
+                    ].join(' ')}
+                  >
+                    {day}
+                  </span>
+                </div>
+              )
+            })}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   )

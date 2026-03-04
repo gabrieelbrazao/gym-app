@@ -4,7 +4,8 @@ import { useRoutineStore } from '../stores/useRoutineStore'
 import type { RoutineExercise, Exercise } from '../types'
 import { exercises as exerciseDb } from '../data/exercises'
 import ExercisePicker from '../components/ExercisePicker'
-import { Plus, Trash2, ArrowLeft } from 'lucide-react'
+import NumericInput from '../components/NumericInput'
+import { Plus, Trash2, ArrowLeft, ChevronDown, ChevronRight } from 'lucide-react'
 import { t } from '../i18n'
 
 export default function RoutineEditor() {
@@ -19,23 +20,67 @@ export default function RoutineEditor() {
     existing?.exercises ?? []
   )
   const [showPicker, setShowPicker] = useState(false)
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
 
   const handleAddExercise = (exercise: Exercise) => {
     setRoutineExercises((prev) => [
       ...prev,
-      { exerciseId: exercise.id, sets: 3, reps: 10, restSeconds: 90 },
+      { exerciseId: exercise.id, sets: 3, reps: 10, weight: 0 },
     ])
     setShowPicker(false)
   }
 
   const handleRemoveExercise = (index: number) => {
     setRoutineExercises((prev) => prev.filter((_, i) => i !== index))
+    if (expandedIndex === index) setExpandedIndex(null)
   }
 
   const handleUpdateExercise = (index: number, data: Partial<RoutineExercise>) => {
     setRoutineExercises((prev) =>
-      prev.map((e, i) => (i === index ? { ...e, ...data } : e))
+      prev.map((e, i) => {
+        if (i !== index) return e
+        let updated = { ...e, ...data }
+        // when the default weight changes, reset all per-set weights to the new value
+        if ('weight' in data && updated.weights) {
+          updated = { ...updated, weights: updated.weights.map(() => data.weight as number) }
+        }
+        // when the default reps changes, reset all per-set reps to the new value
+        if ('reps' in data && updated.repsPerSet) {
+          updated = { ...updated, repsPerSet: updated.repsPerSet.map(() => data.reps as number) }
+        }
+        // when sets count changes, resize the per-set arrays if they exist
+        if ('sets' in data) {
+          const n = updated.sets
+          if (updated.weights) {
+            updated = {
+              ...updated,
+              weights: Array.from({ length: n }, (_, j) => updated.weights![j] ?? e.weight),
+            }
+          }
+          if (updated.repsPerSet) {
+            updated = {
+              ...updated,
+              repsPerSet: Array.from({ length: n }, (_, j) => updated.repsPerSet![j] ?? e.reps),
+            }
+          }
+        }
+        return updated
+      })
     )
+  }
+
+  const handleTogglePerSet = (index: number) => {
+    const re = routineExercises[index]
+    if (expandedIndex === index) {
+      setExpandedIndex(null)
+    } else {
+      // initialise per-set arrays if not yet set
+      const init: Partial<RoutineExercise> = {}
+      if (!re.weights) init.weights = Array.from({ length: re.sets }, () => re.weight)
+      if (!re.repsPerSet) init.repsPerSet = Array.from({ length: re.sets }, () => re.reps)
+      if (Object.keys(init).length > 0) handleUpdateExercise(index, init)
+      setExpandedIndex(index)
+    }
   }
 
   const handleSave = () => {
@@ -89,36 +134,81 @@ export default function RoutineEditor() {
             <div className="flex gap-3">
               <label className="flex flex-col gap-1">
                 <span className="text-xs text-text-secondary">{t('editor.sets')}</span>
-                <input
-                  type="number"
-                  min={1}
+                <NumericInput
                   value={re.sets}
-                  onChange={(e) => handleUpdateExercise(index, { sets: Number(e.target.value) })}
+                  min={1}
+                  onChange={(v) => handleUpdateExercise(index, { sets: v })}
                   className="w-16 rounded border border-border bg-bg-input px-2 py-1 text-center text-sm text-text-primary focus:border-accent focus:outline-none"
                 />
               </label>
               <label className="flex flex-col gap-1">
                 <span className="text-xs text-text-secondary">{t('editor.reps')}</span>
-                <input
-                  type="number"
-                  min={1}
+                <NumericInput
                   value={re.reps}
-                  onChange={(e) => handleUpdateExercise(index, { reps: Number(e.target.value) })}
+                  min={1}
+                  onChange={(v) => handleUpdateExercise(index, { reps: v })}
                   className="w-16 rounded border border-border bg-bg-input px-2 py-1 text-center text-sm text-text-primary focus:border-accent focus:outline-none"
                 />
               </label>
               <label className="flex flex-col gap-1">
-                <span className="text-xs text-text-secondary">{t('editor.rest')}</span>
-                <input
-                  type="number"
+                <span className="text-xs text-text-secondary">{t('editor.weight')}</span>
+                <NumericInput
+                  value={re.weight}
                   min={0}
-                  step={15}
-                  value={re.restSeconds}
-                  onChange={(e) => handleUpdateExercise(index, { restSeconds: Number(e.target.value) })}
-                  className="w-20 rounded border border-border bg-bg-input px-2 py-1 text-center text-sm text-text-primary focus:border-accent focus:outline-none"
+                  onChange={(v) => handleUpdateExercise(index, { weight: v })}
+                  className="w-16 rounded border border-border bg-bg-input px-2 py-1 text-center text-sm text-text-primary focus:border-accent focus:outline-none"
                 />
               </label>
             </div>
+
+            <button
+              onClick={() => handleTogglePerSet(index)}
+              className="flex items-center gap-1 self-start text-xs text-text-secondary transition-colors hover:text-accent"
+            >
+              {expandedIndex === index ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+              {t('editor.perSet')}
+            </button>
+
+            {expandedIndex === index && (
+              <div className="flex flex-col gap-1 rounded-lg bg-bg-input px-3 py-2">
+                <div className="flex gap-3 text-xs text-text-secondary">
+                  <span className="w-6" />
+                  <span className="w-16 text-center">{t('editor.reps')}</span>
+                  <span className="w-16 text-center">{t('editor.weight')}</span>
+                </div>
+                {Array.from({ length: re.sets }, (_, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <span className="w-6 text-center text-xs text-text-secondary">{i + 1}</span>
+                    <NumericInput
+                      value={re.repsPerSet?.[i] ?? re.reps}
+                      min={1}
+                      onChange={(v) => {
+                        const arr = Array.from(
+                          { length: re.sets },
+                          (_, j) => re.repsPerSet?.[j] ?? re.reps
+                        )
+                        arr[i] = v
+                        handleUpdateExercise(index, { repsPerSet: arr })
+                      }}
+                      className="w-16 rounded border border-border bg-bg-card px-2 py-1 text-center text-sm text-text-primary focus:border-accent focus:outline-none"
+                    />
+                    <NumericInput
+                      value={re.weights?.[i] ?? re.weight}
+                      min={0}
+                      onChange={(v) => {
+                        const arr = Array.from(
+                          { length: re.sets },
+                          (_, j) => re.weights?.[j] ?? re.weight
+                        )
+                        arr[i] = v
+                        handleUpdateExercise(index, { weights: arr })
+                      }}
+                      className="w-16 rounded border border-border bg-bg-card px-2 py-1 text-center text-sm text-text-primary focus:border-accent focus:outline-none"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

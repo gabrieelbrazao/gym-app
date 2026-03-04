@@ -16,7 +16,7 @@ describe('useRoutineStore', () => {
     addRoutine({
       name: 'Push Day',
       exercises: [
-        { exerciseId: 'bench-press', sets: 3, reps: 10, restSeconds: 90 },
+        { exerciseId: 'bench-press', sets: 3, reps: 10, weight: 0 },
       ],
     })
 
@@ -31,7 +31,7 @@ describe('useRoutineStore', () => {
     const { addRoutine } = useRoutineStore.getState()
     addRoutine({
       name: 'Push Day',
-      exercises: [{ exerciseId: 'bench-press', sets: 3, reps: 10, restSeconds: 90 }],
+      exercises: [{ exerciseId: 'bench-press', sets: 3, reps: 10, weight: 0 }],
     })
 
     const id = useRoutineStore.getState().routines[0].id

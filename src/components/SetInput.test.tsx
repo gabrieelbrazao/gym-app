@@ -27,6 +27,7 @@ describe('SetInput', () => {
     const repsInput = screen.getByDisplayValue('10')
     await user.clear(repsInput)
     await user.type(repsInput, '12')
+    await user.tab()
     expect(onChange).toHaveBeenCalled()
   })
 

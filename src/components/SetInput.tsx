@@ -1,5 +1,7 @@
+import { motion } from 'framer-motion'
 import type { SetLog } from '../types'
 import { t } from '../i18n'
+import NumericInput from './NumericInput'
 
 interface SetInputProps {
   index: number
@@ -11,28 +13,27 @@ interface SetInputProps {
 
 export default function SetInput({ index, reps, weight, completed, onChange }: SetInputProps) {
   return (
-    <div
+    <motion.div
+      key={String(completed)}
       className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
         completed ? 'bg-accent/10' : 'bg-bg-input'
       }`}
+      animate={completed ? { scale: [1, 1.04, 1] } : {}}
+      transition={{ duration: 0.25 }}
     >
       <span className="w-6 text-center text-xs font-medium text-text-secondary">
         {index + 1}
       </span>
-      <input
-        type="number"
-        min={0}
+      <NumericInput
         value={weight}
-        onChange={(e) => onChange({ weight: Number(e.target.value) })}
+        onChange={(n) => onChange({ weight: n })}
         className="w-16 rounded border border-border bg-bg-card px-2 py-1 text-center text-sm text-text-primary focus:border-accent focus:outline-none"
         aria-label="Weight"
       />
       <span className="text-xs text-text-secondary">{t('workout.kg')}</span>
-      <input
-        type="number"
-        min={0}
+      <NumericInput
         value={reps}
-        onChange={(e) => onChange({ reps: Number(e.target.value) })}
+        onChange={(n) => onChange({ reps: n })}
         className="w-16 rounded border border-border bg-bg-card px-2 py-1 text-center text-sm text-text-primary focus:border-accent focus:outline-none"
         aria-label="Reps"
       />
@@ -43,6 +44,6 @@ export default function SetInput({ index, reps, weight, completed, onChange }: S
         onChange={(e) => onChange({ completed: e.target.checked })}
         className="ml-auto h-5 w-5 accent-accent"
       />
-    </div>
+    </motion.div>
   )
 }

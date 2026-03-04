@@ -32,7 +32,8 @@ export const ptBR: Record<string, string> = {
   'editor.namePlaceholder': 'Nome da rotina',
   'editor.sets': 'Séries',
   'editor.reps': 'Reps',
-  'editor.rest': 'Descanso (s)',
+  'editor.weight': 'Peso (kg)',
+  'editor.perSet': 'Por série',
   'editor.addExercise': 'Adicionar Exercício',
   'editor.save': 'Salvar Rotina',
 
@@ -47,6 +48,7 @@ export const ptBR: Record<string, string> = {
   'workout.reps': 'reps',
   'workout.addSet': 'Adicionar Série',
   'workout.addExercise': 'Adicionar Exercício',
+  'workout.cancel': 'Cancelar treino',
 
   // History
   'history.title': 'Histórico',

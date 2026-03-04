@@ -38,7 +38,9 @@ export interface RoutineExercise {
   exerciseId: string
   sets: number
   reps: number
-  restSeconds: number
+  weight: number
+  weights?: number[]
+  repsPerSet?: number[]
 }
 
 export interface Routine {

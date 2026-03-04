@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useWorkoutStore } from '../stores/useWorkoutStore'
 import { useHistoryStore } from '../stores/useHistoryStore'
 import { useRoutineStore } from '../stores/useRoutineStore'
@@ -12,10 +13,12 @@ import { t } from '../i18n'
 
 export default function ActiveWorkout() {
   const navigate = useNavigate()
-  const { session, startSession, addExercise, addSet, updateSet, finishWorkout } = useWorkoutStore()
+  const { session, startSession, addExercise, addSet, updateSet, cancelWorkout, finishWorkout } = useWorkoutStore()
   const { saveSession } = useHistoryStore()
   const { routines } = useRoutineStore()
   const [showPicker, setShowPicker] = useState(false)
+
+  useEffect(() => { cancelWorkout() }, [])
 
   const getExerciseName = (exerciseId: string) =>
     exerciseDb.find((e) => e.id === exerciseId)?.name ?? exerciseId
@@ -38,29 +41,33 @@ export default function ActiveWorkout() {
       <div className="flex flex-col gap-4">
         <h1 className="font-display text-4xl">{t('workout.startTitle')}</h1>
 
-        <button
+        <motion.button
           onClick={() => startSession()}
           className="flex items-center justify-center gap-2 rounded-lg bg-accent py-4 text-lg font-medium text-bg-primary"
+          whileTap={{ scale: 0.97 }}
         >
           <Dumbbell size={20} />
           {t('workout.freestyle')}
-        </button>
+        </motion.button>
 
         {routines.length > 0 && (
           <>
             <p className="text-sm text-text-secondary">{t('workout.fromRoutine')}</p>
             <div className="flex flex-col gap-2">
               {routines.map((routine) => (
-                <button
+                <motion.button
                   key={routine.id}
                   onClick={() => startSession(routine.exercises)}
                   className="rounded-lg border border-border bg-bg-card px-4 py-3 text-left transition-colors hover:border-accent"
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 >
                   <p className="font-medium text-text-primary">{routine.name}</p>
                   <p className="text-xs text-text-secondary">
                     {routine.exercises.length} {t('common.exercises')}
                   </p>
-                </button>
+                </motion.button>
               ))}
             </div>
           </>
@@ -73,58 +80,79 @@ export default function ActiveWorkout() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-4xl">{t('workout.title')}</h1>
-        <button
+        <motion.button
           onClick={handleFinish}
           className="flex items-center gap-1 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-bg-primary"
+          whileTap={{ scale: 0.95 }}
         >
           <CheckCircle size={16} />
           {t('workout.finish')}
-        </button>
+        </motion.button>
       </div>
 
-      {session.entries.map((entry, entryIndex) => (
-        <div key={`${entry.exerciseId}-${entryIndex}`} className="rounded-lg border border-border bg-bg-card p-4">
-          <h3 className="mb-3 font-display text-xl text-text-primary">
-            {getExerciseName(entry.exerciseId)}
-          </h3>
-
-          <div className="mb-2 flex gap-3 px-3 text-xs text-text-secondary">
-            <span className="w-6">{t('workout.set')}</span>
-            <span className="w-16 text-center">{t('workout.kg')}</span>
-            <span className="w-4" />
-            <span className="w-16 text-center">{t('workout.reps')}</span>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            {entry.sets.map((s, setIndex) => (
-              <SetInput
-                key={setIndex}
-                index={setIndex}
-                reps={s.reps}
-                weight={s.weight}
-                completed={s.completed}
-                onChange={(data) => updateSet(entryIndex, setIndex, data)}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={() => addSet(entryIndex)}
-            className="mt-2 flex w-full items-center justify-center gap-1 rounded py-2 text-xs text-text-secondary transition-colors hover:text-accent"
+      <AnimatePresence>
+        {session.entries.map((entry, entryIndex) => (
+          <motion.div
+            key={`${entry.exerciseId}-${entryIndex}`}
+            className="rounded-lg border border-border bg-bg-card p-4"
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 24 }}
+            transition={{ duration: 0.22 }}
           >
-            <Plus size={14} />
-            {t('workout.addSet')}
-          </button>
-        </div>
-      ))}
+            <div className="mb-3">
+              <h3 className="font-display text-xl text-text-primary">
+                {getExerciseName(entry.exerciseId)}
+              </h3>
+            </div>
 
-      <button
+            <div className="mb-2 flex gap-3 px-3 text-xs text-text-secondary">
+              <span className="w-6">{t('workout.set')}</span>
+              <span className="w-16 text-center">{t('workout.kg')}</span>
+              <span className="w-4" />
+              <span className="w-16 text-center">{t('workout.reps')}</span>
+            </div>
+
+            <AnimatePresence>
+              <div className="flex flex-col gap-2">
+                {entry.sets.map((s, setIndex) => (
+                  <motion.div
+                    key={setIndex}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.18 }}
+                  >
+                    <SetInput
+                      index={setIndex}
+                      reps={s.reps}
+                      weight={s.weight}
+                      completed={s.completed}
+                      onChange={(data) => updateSet(entryIndex, setIndex, data)}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </AnimatePresence>
+
+            <button
+              onClick={() => addSet(entryIndex)}
+              className="mt-2 flex w-full items-center justify-center gap-1 rounded py-2 text-xs text-text-secondary transition-colors hover:text-accent"
+            >
+              <Plus size={14} />
+              {t('workout.addSet')}
+            </button>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+
+      <motion.button
         onClick={() => setShowPicker(true)}
         className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-border py-3 text-sm text-text-secondary transition-colors hover:border-accent hover:text-accent"
+        whileTap={{ scale: 0.97 }}
       >
         <Plus size={16} />
         {t('workout.addExercise')}
-      </button>
+      </motion.button>
 
       {showPicker && (
         <ExercisePicker onSelect={handleAddExercise} onClose={() => setShowPicker(false)} />

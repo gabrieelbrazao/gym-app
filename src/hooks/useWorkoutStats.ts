@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useHistoryStore } from '../stores/useHistoryStore'
 import { exercises as exerciseDb } from '../data/exercises'
+import { localDateISO, subtractDay, diffDays } from '../lib/dateUtils'
 
 export interface WorkoutStats {
   currentStreak: number
@@ -9,22 +10,6 @@ export interface WorkoutStats {
   avgPerWeek: number
   mostTrainedMuscle: string
   trainedDates: Set<string>
-}
-
-function todayISO(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function subtractDay(iso: string): string {
-  const d = new Date(iso + 'T00:00:00')
-  d.setDate(d.getDate() - 1)
-  return d.toISOString().slice(0, 10)
-}
-
-function diffDays(a: string, b: string): number {
-  const da = new Date(a + 'T00:00:00')
-  const db = new Date(b + 'T00:00:00')
-  return Math.round((db.getTime() - da.getTime()) / (1000 * 60 * 60 * 24))
 }
 
 export function useWorkoutStats(): WorkoutStats {
@@ -45,7 +30,7 @@ export function useWorkoutStats(): WorkoutStats {
     }
 
     const trainedDates = new Set(completed.map((s) => s.date))
-    const today = todayISO()
+    const today = localDateISO()
 
     // Current streak: walk back from today (or yesterday) while dates exist
     let currentStreak = 0

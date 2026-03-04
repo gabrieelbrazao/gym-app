@@ -38,6 +38,51 @@ describe('Routines', () => {
     expect(screen.getByText('Pull Day')).toBeInTheDocument()
   })
 
+  it('shows plural exercise count', () => {
+    useRoutineStore.getState().addRoutine({
+      name: 'Push Day',
+      exercises: [
+        { exerciseId: 'bench-press', sets: 3, reps: 10, weight: 0 },
+        { exerciseId: 'squat', sets: 4, reps: 8, weight: 0 },
+      ],
+    })
+    renderPage()
+
+    expect(screen.getByText(/exercícios/)).toBeInTheDocument()
+  })
+
+  it('shows singular exercise count', () => {
+    useRoutineStore.getState().addRoutine({
+      name: 'Push Day',
+      exercises: [{ exerciseId: 'bench-press', sets: 3, reps: 10, weight: 0 }],
+    })
+    renderPage()
+
+    expect(screen.getByText(/exercício/)).toBeInTheDocument()
+    expect(screen.queryByText(/exercícios/)).not.toBeInTheDocument()
+  })
+
+  it('shows exercise chips for routines with exercises', () => {
+    useRoutineStore.getState().addRoutine({
+      name: 'Push Day',
+      exercises: [
+        { exerciseId: 'bench-press', sets: 3, reps: 10, weight: 0 },
+        { exerciseId: 'squat', sets: 4, reps: 8, weight: 0 },
+      ],
+    })
+    renderPage()
+
+    expect(screen.getByText('Supino Reto')).toBeInTheDocument()
+    expect(screen.getByText('Agachamento')).toBeInTheDocument()
+  })
+
+  it('does not show exercise list for routines with no exercises', () => {
+    useRoutineStore.getState().addRoutine({ name: 'Empty Routine', exercises: [] })
+    renderPage()
+
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+  })
+
   it('deletes a routine when delete is clicked', async () => {
     const user = userEvent.setup()
     useRoutineStore.getState().addRoutine({ name: 'Push Day', exercises: [] })
@@ -52,5 +97,14 @@ describe('Routines', () => {
     renderPage()
     const link = screen.getByText('Nova Rotina')
     expect(link.closest('a')).toHaveAttribute('href', '/routines/new')
+  })
+
+  it('has an edit link for each routine', () => {
+    useRoutineStore.getState().addRoutine({ name: 'Push Day', exercises: [] })
+    renderPage()
+
+    const id = useRoutineStore.getState().routines[0].id
+    const editLink = screen.getByRole('link', { name: '' })
+    expect(editLink).toHaveAttribute('href', `/routines/${id}/edit`)
   })
 })

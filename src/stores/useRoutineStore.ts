@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Routine, RoutineExercise } from '../types'
+import { uuid } from '../lib/dateUtils'
 
 interface RoutineStore {
   routines: Routine[]
@@ -17,7 +18,7 @@ export const useRoutineStore = create<RoutineStore>()(
 
       addRoutine: (data) => {
         const routine: Routine = {
-          id: crypto.randomUUID(),
+          id: uuid(),
           name: data.name,
           exercises: data.exercises,
           createdAt: new Date().toISOString(),

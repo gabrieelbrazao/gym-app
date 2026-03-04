@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useHistoryStore } from '../stores/useHistoryStore'
 import { exercises as exerciseDb } from '../data/exercises'
 import { Trophy } from 'lucide-react'
@@ -7,6 +8,7 @@ import FatigueMonitor from '../components/FatigueMonitor'
 import StreakCards from '../components/StreakCards'
 import WorkoutCalendar from '../components/WorkoutCalendar'
 import SummaryStats from '../components/SummaryStats'
+import { staggerContainer, staggerItem } from '../lib/motion'
 
 interface PersonalRecord {
   exerciseName: string
@@ -56,20 +58,29 @@ export default function Progress() {
           <Trophy size={20} className="text-accent" />
           {t('progress.records')}
         </h2>
-        <div className="flex flex-col gap-2">
-          {personalRecords.map((pr) => (
-            <div
-              key={pr.exerciseName}
-              className="flex items-center justify-between rounded-lg bg-bg-input px-3 py-2"
-            >
-              <span className="text-sm text-text-primary">{pr.exerciseName}</span>
-              <span className="text-sm font-medium text-accent">{pr.maxWeight} {t('progress.kg')}</span>
-            </div>
-          ))}
+        <motion.div
+          className="flex flex-col gap-2"
+          variants={staggerContainer}
+          initial="initial"
+          animate="animate"
+        >
+          <AnimatePresence>
+            {personalRecords.map((pr) => (
+              <motion.div
+                key={pr.exerciseName}
+                className="flex items-center justify-between rounded-lg bg-bg-input px-3 py-2"
+                variants={staggerItem}
+                exit={{ opacity: 0, x: 20 }}
+              >
+                <span className="text-sm text-text-primary">{pr.exerciseName}</span>
+                <span className="text-sm font-medium text-accent">{pr.maxWeight} {t('progress.kg')}</span>
+              </motion.div>
+            ))}
+          </AnimatePresence>
           {personalRecords.length === 0 && (
             <p className="text-sm text-text-secondary">{t('progress.noRecords')}</p>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   )

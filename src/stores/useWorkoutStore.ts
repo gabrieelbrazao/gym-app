@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { format } from 'date-fns'
 import type { WorkoutSession, SetLog, RoutineExercise } from '../types'
+import { uuid } from '../lib/dateUtils'
 
 interface WorkoutStore {
   session: WorkoutSession | null
@@ -8,6 +9,7 @@ interface WorkoutStore {
   addExercise: (exerciseId: string) => void
   addSet: (entryIndex: number) => void
   updateSet: (entryIndex: number, setIndex: number, data: Partial<SetLog>) => void
+  cancelWorkout: () => void
   finishWorkout: () => WorkoutSession | null
 }
 
@@ -18,9 +20,9 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
     const entries = routineExercises
       ? routineExercises.map((re) => ({
           exerciseId: re.exerciseId,
-          sets: Array.from({ length: re.sets }, () => ({
-            reps: re.reps,
-            weight: 0,
+          sets: Array.from({ length: re.sets }, (_, i) => ({
+            reps: re.repsPerSet?.[i] ?? re.reps,
+            weight: re.weights?.[i] ?? re.weight,
             completed: false,
           })),
         }))
@@ -28,7 +30,7 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
 
     set({
       session: {
-        id: crypto.randomUUID(),
+        id: uuid(),
         date: format(new Date(), 'yyyy-MM-dd'),
         status: 'in-progress',
         entries,
@@ -56,9 +58,10 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
       if (!state.session) return state
       const entries = state.session.entries.map((entry, i) => {
         if (i !== entryIndex) return entry
+        const last = entry.sets[entry.sets.length - 1]
         return {
           ...entry,
-          sets: [...entry.sets, { reps: 0, weight: 0, completed: false }],
+          sets: [...entry.sets, { reps: last?.reps ?? 0, weight: last?.weight ?? 0, completed: false }],
         }
       })
       return { session: { ...state.session, entries } }
@@ -78,6 +81,8 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
       return { session: { ...state.session, entries } }
     })
   },
+
+  cancelWorkout: () => set({ session: null }),
 
   finishWorkout: () => {
     const session = get().session
