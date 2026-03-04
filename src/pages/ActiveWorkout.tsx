@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWorkoutStore } from '../stores/useWorkoutStore'
 import { useHistoryStore } from '../stores/useHistoryStore'
@@ -13,12 +13,20 @@ import { t } from '../i18n'
 
 export default function ActiveWorkout() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { session, startSession, addExercise, addSet, updateSet, cancelWorkout, finishWorkout } = useWorkoutStore()
   const { saveSession } = useHistoryStore()
   const { routines } = useRoutineStore()
   const [showPicker, setShowPicker] = useState(false)
 
-  useEffect(() => { cancelWorkout() }, [])
+  useEffect(() => {
+    cancelWorkout()
+    const routineId = (location.state as { routineId?: string } | null)?.routineId
+    if (routineId) {
+      const routine = routines.find((r) => r.id === routineId)
+      if (routine) startSession(routine.exercises)
+    }
+  }, [])
 
   const getExerciseName = (exerciseId: string) =>
     exerciseDb.find((e) => e.id === exerciseId)?.name ?? exerciseId

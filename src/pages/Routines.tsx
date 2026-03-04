@@ -3,6 +3,7 @@ import { useRoutineStore } from '../stores/useRoutineStore'
 import { exercises as exerciseDb } from '../data/exercises'
 import { Plus, Trash2, Edit, Dumbbell } from 'lucide-react'
 import { t } from '../i18n'
+import WeekSchedule from '../components/WeekSchedule'
 
 export default function Routines() {
   const { routines, deleteRoutine } = useRoutineStore()
@@ -11,7 +12,7 @@ export default function Routines() {
     exerciseDb.find((e) => e.id === exerciseId)?.name ?? exerciseId
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-4xl">{t('routines.title')}</h1>
         <Link
@@ -22,6 +23,8 @@ export default function Routines() {
           {t('routines.new')}
         </Link>
       </div>
+
+      <WeekSchedule />
 
       {routines.length === 0 ? (
         <p className="py-12 text-center text-text-secondary">{t('routines.empty')}</p>

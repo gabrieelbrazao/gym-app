@@ -1,14 +1,29 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useHistoryStore } from '../stores/useHistoryStore'
+import { useRoutineStore } from '../stores/useRoutineStore'
+import { useScheduleStore } from '../stores/useScheduleStore'
 import { exercises as exerciseDb } from '../data/exercises'
 import { Dumbbell, Calendar } from 'lucide-react'
 import { t } from '../i18n'
 import { formatDate } from '../lib/formatDate'
-import { staggerContainer, staggerItem } from '../lib/motion'
+import { staggerContainer, staggerItem, springScale } from '../lib/motion'
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const { sessions } = useHistoryStore()
+  const { routines } = useRoutineStore()
+  const { schedule } = useScheduleStore()
+
+  const todayIndex = new Date().getDay()
+  const todayRoutineId = schedule[todayIndex]
+  const todayRoutine = todayRoutineId ? routines.find((r) => r.id === todayRoutineId) : null
+
+  function handleStartTodayWorkout() {
+    if (todayRoutine) {
+      navigate('/workout', { state: { routineId: todayRoutine.id } })
+    }
+  }
 
   const totalWorkouts = sessions.length
   const totalSets = sessions.reduce(
@@ -52,6 +67,30 @@ export default function Dashboard() {
           <p className="text-xs text-text-secondary">{t('dashboard.totalSets')}</p>
           <p className="mt-1 font-display text-3xl text-text-primary">{totalSets}</p>
         </motion.div>
+      </motion.div>
+
+      <motion.div
+        className="rounded-lg border border-border bg-bg-card p-4"
+        variants={springScale}
+        initial="initial"
+        animate="animate"
+      >
+        <p className="text-xs text-text-secondary">{t('schedule.today')} — {t(`day.${todayIndex}`)}</p>
+        {todayRoutine ? (
+          <div className="mt-2 flex items-center justify-between">
+            <p className="font-display text-xl text-text-primary">{todayRoutine.name}</p>
+            <motion.button
+              onClick={handleStartTodayWorkout}
+              className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-bg-primary"
+              whileTap={{ scale: 0.95 }}
+            >
+              <Dumbbell size={14} />
+              {t('schedule.startWorkout')}
+            </motion.button>
+          </div>
+        ) : (
+          <p className="mt-1 text-sm text-text-secondary">{t('schedule.rest')}</p>
+        )}
       </motion.div>
 
       <div>

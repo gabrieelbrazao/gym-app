@@ -34,8 +34,9 @@ describe('Routines', () => {
     useRoutineStore.getState().addRoutine({ name: 'Pull Day', exercises: [] })
     renderPage()
 
-    expect(screen.getByText('Push Day')).toBeInTheDocument()
-    expect(screen.getByText('Pull Day')).toBeInTheDocument()
+    // routine names appear in both the card headings and the week schedule select options
+    expect(screen.getAllByText('Push Day').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Pull Day').length).toBeGreaterThan(0)
   })
 
   it('shows plural exercise count', () => {

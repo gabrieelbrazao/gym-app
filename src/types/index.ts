@@ -69,6 +69,8 @@ export interface WorkoutSession {
   entries: WorkoutEntry[]
 }
 
+export type WeekSchedule = Record<number, string | null>
+
 export type MuscleStatus = 'untrained' | 'trained-this-week' | 'trained-today'
 
 export type FatigueStatus = 'ready' | 'resting' | 'fatigued'

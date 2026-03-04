@@ -111,6 +111,14 @@ export const ptBR: Record<string, string> = {
   'fatigue.yesterday': 'Ontem',
   'fatigue.daysAgo': 'dias atrás',
 
+  // Week Schedule
+  'schedule.title': 'Plano Semanal',
+  'schedule.rest': 'Descanso',
+  'schedule.today': 'Hoje',
+  'schedule.startWorkout': 'Iniciar Treino',
+  'day.0': 'Dom', 'day.1': 'Seg', 'day.2': 'Ter', 'day.3': 'Qua',
+  'day.4': 'Qui', 'day.5': 'Sex', 'day.6': 'Sáb',
+
   // Equipment
   'equipment.barbell': 'Barra',
   'equipment.dumbbell': 'Halteres',

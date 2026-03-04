@@ -2,9 +2,11 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import basicSsl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig({
   plugins: [
+    basicSsl(),
     react(),
     tailwindcss(),
     VitePWA({
@@ -55,5 +57,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/__tests__/setup.ts',
     css: true,
+  },
+  server: {
+    allowedHosts: true,
   },
 })
