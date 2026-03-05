@@ -111,6 +111,11 @@ export const ptBR: Record<string, string> = {
   'fatigue.yesterday': 'Ontem',
   'fatigue.daysAgo': 'dias atrás',
 
+  // Time insights
+  'stats.totalTime': 'Tempo Total',
+  'stats.avgDuration': 'Duração Média',
+  'stats.longestSession': 'Maior Treino',
+
   // Timer
   'timer.rest': 'Descanso',
   'timer.skip': 'Pular',

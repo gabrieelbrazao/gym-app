@@ -10,6 +10,9 @@ export interface WorkoutStats {
   avgPerWeek: number
   mostTrainedMuscle: string
   trainedDates: Set<string>
+  totalTimeMinutes: number
+  avgDurationMinutes: number
+  longestSessionMinutes: number
 }
 
 export function useWorkoutStats(): WorkoutStats {
@@ -26,6 +29,9 @@ export function useWorkoutStats(): WorkoutStats {
         avgPerWeek: 0,
         mostTrainedMuscle: '',
         trainedDates: new Set<string>(),
+        totalTimeMinutes: 0,
+        avgDurationMinutes: 0,
+        longestSessionMinutes: 0,
       }
     }
 
@@ -85,6 +91,15 @@ export function useWorkoutStats(): WorkoutStats {
       }
     }
 
-    return { currentStreak, bestStreak, totalWorkouts, avgPerWeek, mostTrainedMuscle, trainedDates }
+    const timedSessions = completed.filter((s) => s.durationMinutes !== undefined)
+    const totalTimeMinutes = timedSessions.reduce((sum, s) => sum + (s.durationMinutes ?? 0), 0)
+    const avgDurationMinutes = timedSessions.length > 0
+      ? Math.round(totalTimeMinutes / timedSessions.length)
+      : 0
+    const longestSessionMinutes = timedSessions.length > 0
+      ? Math.max(...timedSessions.map((s) => s.durationMinutes ?? 0))
+      : 0
+
+    return { currentStreak, bestStreak, totalWorkouts, avgPerWeek, mostTrainedMuscle, trainedDates, totalTimeMinutes, avgDurationMinutes, longestSessionMinutes }
   }, [sessions])
 }

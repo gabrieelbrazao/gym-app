@@ -32,6 +32,9 @@ describe('useWorkoutStats', () => {
     expect(result.current.avgPerWeek).toBe(0)
     expect(result.current.mostTrainedMuscle).toBe('')
     expect(result.current.trainedDates.size).toBe(0)
+    expect(result.current.totalTimeMinutes).toBe(0)
+    expect(result.current.avgDurationMinutes).toBe(0)
+    expect(result.current.longestSessionMinutes).toBe(0)
   })
 
   it('currentStreak counts consecutive days ending today', () => {
@@ -101,6 +104,51 @@ describe('useWorkoutStats', () => {
     expect(result.current.trainedDates.has('2026-03-03')).toBe(true)
     expect(result.current.trainedDates.has('2026-03-01')).toBe(true)
     expect(result.current.trainedDates.has('2026-03-02')).toBe(false)
+  })
+
+  it('totalTimeMinutes sums durationMinutes of timed sessions', () => {
+    useHistoryStore.setState({
+      sessions: [
+        { ...makeSession('2026-03-03'), durationMinutes: 45 },
+        { ...makeSession('2026-03-02'), durationMinutes: 30 },
+        makeSession('2026-03-01'), // no durationMinutes
+      ],
+    })
+    const { result } = renderHook(() => useWorkoutStats())
+    expect(result.current.totalTimeMinutes).toBe(75)
+  })
+
+  it('avgDurationMinutes is the mean of timed sessions only', () => {
+    useHistoryStore.setState({
+      sessions: [
+        { ...makeSession('2026-03-03'), durationMinutes: 60 },
+        { ...makeSession('2026-03-02'), durationMinutes: 40 },
+        makeSession('2026-03-01'), // excluded from average
+      ],
+    })
+    const { result } = renderHook(() => useWorkoutStats())
+    expect(result.current.avgDurationMinutes).toBe(50)
+  })
+
+  it('longestSessionMinutes is the max duration', () => {
+    useHistoryStore.setState({
+      sessions: [
+        { ...makeSession('2026-03-03'), durationMinutes: 90 },
+        { ...makeSession('2026-03-02'), durationMinutes: 45 },
+      ],
+    })
+    const { result } = renderHook(() => useWorkoutStats())
+    expect(result.current.longestSessionMinutes).toBe(90)
+  })
+
+  it('time stats are 0 when no sessions have durationMinutes', () => {
+    useHistoryStore.setState({
+      sessions: [makeSession('2026-03-03'), makeSession('2026-03-02')],
+    })
+    const { result } = renderHook(() => useWorkoutStats())
+    expect(result.current.totalTimeMinutes).toBe(0)
+    expect(result.current.avgDurationMinutes).toBe(0)
+    expect(result.current.longestSessionMinutes).toBe(0)
   })
 
   it('mostTrainedMuscle returns the muscle group with most sessions', () => {

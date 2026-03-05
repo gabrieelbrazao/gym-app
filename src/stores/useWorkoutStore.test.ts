@@ -16,6 +16,7 @@ describe('useWorkoutStore', () => {
     expect(session).not.toBeNull()
     expect(session!.status).toBe('in-progress')
     expect(session!.entries).toEqual([])
+    expect(session!.startTime).toBeTruthy()
   })
 
   it('starts a session from a routine', () => {
@@ -112,6 +113,7 @@ describe('useWorkoutStore', () => {
 
     const completed = useWorkoutStore.getState().finishWorkout()
     expect(completed!.status).toBe('completed')
+    expect(completed!.durationMinutes).toBeGreaterThanOrEqual(0)
     expect(useWorkoutStore.getState().session).toBeNull()
   })
 

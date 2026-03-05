@@ -65,6 +65,8 @@ export interface WorkoutSession {
   id: string
   routineId?: string
   date: string
+  startTime?: string
+  durationMinutes?: number
   status: 'in-progress' | 'completed'
   entries: WorkoutEntry[]
 }

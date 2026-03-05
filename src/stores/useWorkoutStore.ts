@@ -32,6 +32,7 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
       session: {
         id: uuid(),
         date: format(new Date(), 'yyyy-MM-dd'),
+        startTime: new Date().toISOString(),
         status: 'in-progress',
         entries,
       },
@@ -87,7 +88,10 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
   finishWorkout: () => {
     const session = get().session
     if (!session) return null
-    const completed: WorkoutSession = { ...session, status: 'completed' }
+    const durationMinutes = session.startTime
+      ? Math.round((Date.now() - new Date(session.startTime).getTime()) / 60000)
+      : undefined
+    const completed: WorkoutSession = { ...session, status: 'completed', durationMinutes }
     set({ session: null })
     return completed
   },

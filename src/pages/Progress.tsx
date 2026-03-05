@@ -8,6 +8,7 @@ import FatigueMonitor from '../components/FatigueMonitor'
 import StreakCards from '../components/StreakCards'
 import WorkoutCalendar from '../components/WorkoutCalendar'
 import SummaryStats from '../components/SummaryStats'
+import TimeStats from '../components/TimeStats'
 import { staggerContainer, staggerItem } from '../lib/motion'
 
 interface PersonalRecord {
@@ -52,6 +53,8 @@ export default function Progress() {
       <WorkoutCalendar />
 
       <SummaryStats />
+
+      <TimeStats />
 
       <div className="rounded-lg border border-border bg-bg-card p-4">
         <h2 className="mb-3 flex items-center gap-2 font-display text-2xl">
