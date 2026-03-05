@@ -16,6 +16,7 @@ export function useRestTimer(): RestTimerState {
   const [remaining, setRemaining] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const endTimeRef = useRef<number>(0)
 
   const clearTimer = () => {
     if (intervalRef.current) {
@@ -24,6 +25,28 @@ export function useRestTimer(): RestTimerState {
     }
   }
 
+  const tick = useCallback(() => {
+    const left = Math.ceil((endTimeRef.current - Date.now()) / 1000)
+    if (left <= 0) {
+      clearTimer()
+      setIsRunning(false)
+      setRemaining(0)
+      try { navigator.vibrate(200) } catch {}
+    } else {
+      setRemaining(left)
+    }
+  }, [])
+
+  // Sync immediately when app returns to foreground
+  useEffect(() => {
+    if (!isRunning) return
+    const onVisibilityChange = () => {
+      if (!document.hidden) tick()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange)
+  }, [isRunning, tick])
+
   useEffect(() => {
     return clearTimer
   }, [])
@@ -31,20 +54,11 @@ export function useRestTimer(): RestTimerState {
   const start = useCallback((d?: number) => {
     clearTimer()
     const dur = d ?? duration
+    endTimeRef.current = Date.now() + dur * 1000
     setRemaining(dur)
     setIsRunning(true)
-    intervalRef.current = setInterval(() => {
-      setRemaining((prev) => {
-        if (prev <= 1) {
-          clearTimer()
-          setIsRunning(false)
-          try { navigator.vibrate(200) } catch {}
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-  }, [duration])
+    intervalRef.current = setInterval(tick, 1000)
+  }, [duration, tick])
 
   const skip = useCallback(() => {
     clearTimer()

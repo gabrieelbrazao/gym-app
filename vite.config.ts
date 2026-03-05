@@ -27,6 +27,7 @@ export default defineConfig({
         ],
       },
       workbox: {
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
@@ -60,5 +61,10 @@ export default defineConfig({
   },
   server: {
     allowedHosts: true,
+  },
+  preview: {
+    headers: {
+      'Cache-Control': 'no-store',
+    },
   },
 })

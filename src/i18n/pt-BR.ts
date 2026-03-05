@@ -1,7 +1,7 @@
 export const ptBR: Record<string, string> = {
   // Nav
   'nav.home': 'Início',
-  'nav.exercises': 'Exercícios',
+  'nav.exercises': 'Exercícioss',
   'nav.routines': 'Rotinas',
   'nav.progress': 'Progresso',
 
