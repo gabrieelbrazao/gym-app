@@ -4,10 +4,10 @@ import { t } from '../i18n'
 import { type FatigueStatus, type MuscleGroup } from '../types'
 import { staggerContainer, staggerItem } from '../lib/motion'
 
-const STATUS_STYLES: Record<FatigueStatus, { badge: string; dot: string }> = {
-  fatigued: { badge: 'bg-red-500/15 text-red-400', dot: 'bg-red-400' },
-  resting:  { badge: 'bg-amber-500/15 text-amber-400', dot: 'bg-amber-400' },
-  ready:    { badge: 'bg-accent/15 text-accent', dot: 'bg-accent' },
+const STATUS_STYLES: Record<FatigueStatus, { badge: string; dot: string; bar: string; bg: string }> = {
+  fatigued: { badge: 'bg-red-500/15 text-red-400', dot: 'bg-red-400', bar: 'bg-red-400', bg: 'bg-red-500/5' },
+  resting:  { badge: 'bg-amber-500/15 text-amber-400', dot: 'bg-amber-400', bar: 'bg-amber-400', bg: 'bg-amber-500/5' },
+  ready:    { badge: 'bg-accent/15 text-accent', dot: 'bg-accent', bar: 'bg-accent', bg: 'bg-accent/5' },
 }
 
 function subText(daysAgo: number | null): string {
@@ -31,12 +31,12 @@ export default function FatigueMonitor() {
         initial="initial"
         animate="animate"
       >
-        {muscles.map(({ muscleGroup, daysAgo, status }, index) => {
+        {muscles.map(({ muscleGroup, daysAgo, status, recoveryPct }, index) => {
           const styles = STATUS_STYLES[status]
           return (
             <motion.div
               key={muscleGroup}
-              className="bg-surface rounded-xl p-3 flex flex-col gap-1.5"
+              className={`rounded-xl p-3 flex flex-col gap-1.5 ${styles.bg}`}
               variants={staggerItem}
               transition={{ delay: index * 0.04 }}
             >
@@ -50,10 +50,22 @@ export default function FatigueMonitor() {
                   {t(`muscle.${muscleGroup}` as `muscle.${MuscleGroup}`)}
                 </span>
               </div>
-              <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full w-fit ${styles.badge}`}>
-                {t(`fatigue.${status}`)}
-              </span>
-              <span className="text-[10px] text-secondary">{subText(daysAgo)}</span>
+
+              <div className="w-full h-1 rounded-full overflow-hidden bg-black/10">
+                <motion.div
+                  className={`h-full rounded-full ${styles.bar}`}
+                  initial={{ width: 0 }}
+                  animate={{ width: recoveryPct === 0 ? '4px' : `${recoveryPct}%` }}
+                  transition={{ duration: 0.6, ease: 'easeOut', delay: index * 0.04 }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-1 flex-wrap">
+                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${styles.badge}`}>
+                  {t(`fatigue.${status}`)}
+                </span>
+                <span className="text-[10px] text-secondary">{subText(daysAgo)}</span>
+              </div>
             </motion.div>
           )
         })}

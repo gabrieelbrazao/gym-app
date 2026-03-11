@@ -43,7 +43,7 @@ export function useFatigue(): MuscleFatigue[] {
       }
 
       if (!lastTrainedDate) {
-        return { muscleGroup, lastTrainedDate: null, daysAgo: null, status: 'ready' }
+        return { muscleGroup, lastTrainedDate: null, daysAgo: null, status: 'ready', recoveryPct: 100 }
       }
 
       const daysAgo = diffDays(lastTrainedDate, today)
@@ -58,7 +58,8 @@ export function useFatigue(): MuscleFatigue[] {
         status = 'ready'
       }
 
-      return { muscleGroup, lastTrainedDate, daysAgo, status }
+      const recoveryPct = Math.min(100, Math.round((daysAgo / R) * 100))
+      return { muscleGroup, lastTrainedDate, daysAgo, status, recoveryPct }
     })
 
     return result.sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status])

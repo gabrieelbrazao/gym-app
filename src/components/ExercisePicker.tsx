@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { exercises } from '../data/exercises'
 import type { Exercise, MuscleGroup } from '../types'
 import MuscleGroupFilter from './MuscleGroupFilter'
@@ -21,8 +22,21 @@ export default function ExercisePicker({ onSelect, onClose }: ExercisePickerProp
   })
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50">
-      <div className="flex max-h-[80vh] w-full max-w-lg flex-col rounded-t-2xl bg-bg-card">
+    <motion.div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="flex max-h-[80vh] w-full max-w-lg flex-col rounded-t-2xl bg-bg-card"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between border-b border-border p-4">
           <h2 className="font-display text-2xl">{t('picker.title')}</h2>
           <button onClick={onClose} aria-label={t('picker.close')} className="text-text-secondary hover:text-text-primary">
@@ -47,10 +61,11 @@ export default function ExercisePicker({ onSelect, onClose }: ExercisePickerProp
 
         <div className="flex-1 overflow-y-auto px-4 pb-4">
           {filtered.map((exercise) => (
-            <button
+            <motion.button
               key={exercise.id}
               onClick={() => onSelect(exercise)}
               className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-bg-input"
+              whileTap={{ scale: 0.97 }}
             >
               <div>
                 <p className="text-sm font-medium text-text-primary">{exercise.name}</p>
@@ -58,10 +73,10 @@ export default function ExercisePicker({ onSelect, onClose }: ExercisePickerProp
                   {t(`muscle.${exercise.muscleGroup}`)} · {t(`equipment.${exercise.equipment}`)}
                 </p>
               </div>
-            </button>
+            </motion.button>
           ))}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

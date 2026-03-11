@@ -86,4 +86,5 @@ export interface MuscleFatigue {
   lastTrainedDate: string | null
   daysAgo: number | null
   status: FatigueStatus
+  recoveryPct: number
 }
