@@ -84,12 +84,13 @@ describe('Routines', () => {
     expect(screen.queryByRole('list')).not.toBeInTheDocument()
   })
 
-  it('deletes a routine when delete is clicked', async () => {
+  it('deletes a routine when delete is clicked and confirmed', async () => {
     const user = userEvent.setup()
     useRoutineStore.getState().addRoutine({ name: 'Push Day', exercises: [] })
     renderPage()
 
     await user.click(screen.getByLabelText('Excluir rotina'))
+    await user.click(screen.getByText('Excluir'))
     expect(screen.queryByText('Push Day')).not.toBeInTheDocument()
     expect(useRoutineStore.getState().routines).toHaveLength(0)
   })
@@ -100,12 +101,12 @@ describe('Routines', () => {
     expect(link.closest('a')).toHaveAttribute('href', '/routines/new')
   })
 
-  it('has an edit link for each routine', () => {
+  it('navigates to edit when routine card is clicked', () => {
     useRoutineStore.getState().addRoutine({ name: 'Push Day', exercises: [] })
     renderPage()
 
     const id = useRoutineStore.getState().routines[0].id
-    const editLink = screen.getByRole('link', { name: '' })
+    const editLink = screen.getByRole('link', { name: /Push Day/i })
     expect(editLink).toHaveAttribute('href', `/routines/${id}/edit`)
   })
 })

@@ -27,6 +27,7 @@ import { exercises as exerciseDb } from '../data/exercises'
 import SetInput from '../components/SetInput'
 import ExercisePicker from '../components/ExercisePicker'
 import RestTimer from '../components/RestTimer'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { Plus, CheckCircle, Dumbbell, X, EyeOff, Eye, GripVertical } from 'lucide-react'
 import type { Exercise, SetLog, WorkoutEntry } from '../types'
 import { t } from '../i18n'
@@ -170,6 +171,7 @@ export default function ActiveWorkout() {
   const { saveSession } = useHistoryStore()
   const { routines } = useRoutineStore()
   const [showPicker, setShowPicker] = useState(false)
+  const [pendingRemoveIndex, setPendingRemoveIndex] = useState<number | null>(null)
   const elapsed = useStopwatch(!!session)
   const restTimer = useRestTimer()
 
@@ -288,7 +290,7 @@ export default function ActiveWorkout() {
                   entryIndex={entryIndex}
                   getExerciseName={getExerciseName}
                   onToggleHide={toggleHideExercise}
-                  onRemove={removeExercise}
+                  onRemove={setPendingRemoveIndex}
                   onAddSet={addSet}
                   onSetChange={handleSetChange}
                 />
@@ -311,6 +313,15 @@ export default function ActiveWorkout() {
 
       {showPicker && (
         <ExercisePicker onSelect={handleAddExercise} onClose={() => setShowPicker(false)} />
+      )}
+
+      {pendingRemoveIndex !== null && (
+        <ConfirmDialog
+          title={t('confirm.removeExerciseTitle')}
+          description={t('confirm.removeExerciseDesc')}
+          onConfirm={() => { removeExercise(pendingRemoveIndex); setPendingRemoveIndex(null) }}
+          onCancel={() => setPendingRemoveIndex(null)}
+        />
       )}
     </div>
   )

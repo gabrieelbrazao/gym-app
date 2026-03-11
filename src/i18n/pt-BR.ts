@@ -84,6 +84,14 @@ export const ptBR: Record<string, string> = {
   'common.exercises': 'exercícios',
   'common.deleteRoutine': 'Excluir rotina',
 
+  // Confirm dialog
+  'confirm.cancel': 'Cancelar',
+  'confirm.delete': 'Excluir',
+  'confirm.deleteRoutineTitle': 'Excluir rotina',
+  'confirm.deleteRoutineDesc': 'Tem certeza? Esta ação não pode ser desfeita.',
+  'confirm.removeExerciseTitle': 'Remover exercício',
+  'confirm.removeExerciseDesc': 'Remover este exercício do treino?',
+
   // Muscle groups
   'muscle.chest': 'Peito',
   'muscle.back': 'Costas',

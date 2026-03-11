@@ -71,6 +71,7 @@ describe('RoutineEditor', () => {
 
     const deleteBtn = screen.getByLabelText('Remover exercício')
     await user.click(deleteBtn)
+    await user.click(screen.getByText('Excluir'))
 
     expect(screen.queryByText('Supino Reto')).not.toBeInTheDocument()
   })

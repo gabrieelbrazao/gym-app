@@ -23,6 +23,7 @@ import type { RoutineExercise, Exercise } from '../types'
 import { exercises as exerciseDb } from '../data/exercises'
 import ExercisePicker from '../components/ExercisePicker'
 import NumericInput from '../components/NumericInput'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { Plus, Trash2, ArrowLeft, ChevronDown, ChevronRight, GripVertical } from 'lucide-react'
 import { t } from '../i18n'
 import { uuid } from '../lib/dateUtils'
@@ -186,6 +187,7 @@ export default function RoutineEditor() {
   )
   const [showPicker, setShowPicker] = useState(false)
   const [expandedUids, setExpandedUids] = useState<Set<string>>(new Set())
+  const [pendingRemoveIndex, setPendingRemoveIndex] = useState<number | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -309,7 +311,7 @@ export default function RoutineEditor() {
                 index={index}
                 isExpanded={expandedUids.has(re.uid ?? '')}
                 getExerciseName={getExerciseName}
-                onRemove={handleRemoveExercise}
+                onRemove={setPendingRemoveIndex}
                 onUpdate={handleUpdateExercise}
                 onTogglePerSet={handleTogglePerSet}
               />
@@ -338,6 +340,15 @@ export default function RoutineEditor() {
         <ExercisePicker
           onSelect={handleAddExercise}
           onClose={() => setShowPicker(false)}
+        />
+      )}
+
+      {pendingRemoveIndex !== null && (
+        <ConfirmDialog
+          title={t('confirm.removeExerciseTitle')}
+          description={t('confirm.removeExerciseDesc')}
+          onConfirm={() => { handleRemoveExercise(pendingRemoveIndex); setPendingRemoveIndex(null) }}
+          onCancel={() => setPendingRemoveIndex(null)}
         />
       )}
     </div>
