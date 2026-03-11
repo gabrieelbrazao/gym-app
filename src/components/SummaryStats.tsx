@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { motion, animate } from 'framer-motion'
+import { Dumbbell, TrendingUp, Flame } from 'lucide-react'
 import { useWorkoutStats } from '../hooks/useWorkoutStats'
 import { t } from '../i18n'
 import { staggerContainer, staggerItem } from '../lib/motion'
@@ -22,6 +23,12 @@ function AnimatedNumber({ value, decimals = 0 }: { value: number; decimals?: num
   return <span ref={ref}>0</span>
 }
 
+const STATS = [
+  { key: 'totalWorkouts',  icon: Dumbbell,    label: 'stats.totalWorkouts' },
+  { key: 'avgPerWeek',     icon: TrendingUp,   label: 'stats.avgPerWeek'   },
+  { key: 'mostTrained',    icon: Flame,        label: 'stats.mostTrained'  },
+] as const
+
 export default function SummaryStats() {
   const { totalWorkouts, avgPerWeek, mostTrainedMuscle } = useWorkoutStats()
 
@@ -36,33 +43,23 @@ export default function SummaryStats() {
       initial="initial"
       animate="animate"
     >
-      <motion.div
-        className="bg-surface rounded-xl px-3 py-3 flex flex-col gap-0.5 items-center text-center"
-        variants={staggerItem}
-      >
-        <span className="text-xl font-bold text-primary">
-          <AnimatedNumber value={totalWorkouts} />
-        </span>
-        <span className="text-[10px] text-secondary leading-tight">{t('stats.totalWorkouts')}</span>
-      </motion.div>
-
-      <motion.div
-        className="bg-surface rounded-xl px-3 py-3 flex flex-col gap-0.5 items-center text-center"
-        variants={staggerItem}
-      >
-        <span className="text-xl font-bold text-primary">
-          <AnimatedNumber value={avgPerWeek} decimals={1} />
-        </span>
-        <span className="text-[10px] text-secondary leading-tight">{t('stats.avgPerWeek')}</span>
-      </motion.div>
-
-      <motion.div
-        className="bg-surface rounded-xl px-3 py-3 flex flex-col gap-0.5 items-center text-center"
-        variants={staggerItem}
-      >
-        <span className="text-xl font-bold text-accent truncate w-full text-center">{muscleLabel}</span>
-        <span className="text-[10px] text-secondary leading-tight">{t('stats.mostTrained')}</span>
-      </motion.div>
+      {STATS.map(({ key, icon: Icon, label }) => (
+        <motion.div
+          key={key}
+          className="bg-bg-card border border-border rounded-xl px-3 py-3 flex flex-col gap-1.5 items-center text-center"
+          variants={staggerItem}
+          whileHover={{ y: -2 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        >
+          <Icon size={14} className="text-accent opacity-80" />
+          <span className="text-2xl font-bold text-text-primary leading-none" style={{ fontFamily: 'var(--font-display)' }}>
+            {key === 'totalWorkouts' && <AnimatedNumber value={totalWorkouts} />}
+            {key === 'avgPerWeek'    && <AnimatedNumber value={avgPerWeek} decimals={1} />}
+            {key === 'mostTrained'   && <span className="text-accent truncate block w-full text-center">{muscleLabel}</span>}
+          </span>
+          <span className="text-[10px] text-text-secondary leading-tight">{t(label)}</span>
+        </motion.div>
+      ))}
     </motion.div>
   )
 }

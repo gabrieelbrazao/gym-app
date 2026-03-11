@@ -2,14 +2,16 @@ import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useHistoryStore } from '../stores/useHistoryStore'
 import { exercises as exerciseDb } from '../data/exercises'
-import { Trophy } from 'lucide-react'
+import { Trophy, BarChart2 } from 'lucide-react'
 import { t } from '../i18n'
 import FatigueMonitor from '../components/FatigueMonitor'
 import StreakCards from '../components/StreakCards'
 import WorkoutCalendar from '../components/WorkoutCalendar'
 import SummaryStats from '../components/SummaryStats'
 import TimeStats from '../components/TimeStats'
-import { staggerContainer, staggerItem } from '../lib/motion'
+import { staggerContainer, staggerItem, fadeUp } from '../lib/motion'
+
+const MEDALS = ['🥇', '🥈', '🥉']
 
 interface PersonalRecord {
   exerciseName: string
@@ -43,22 +45,45 @@ export default function Progress() {
   }, [sessions])
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="font-display text-4xl">{t('progress.title')}</h1>
+    <motion.div
+      className="flex flex-col gap-6"
+      variants={staggerContainer}
+      initial="initial"
+      animate="animate"
+    >
+      <motion.h1 className="font-display text-4xl" variants={fadeUp}>
+        {t('progress.title')}
+      </motion.h1>
 
-      <FatigueMonitor />
+      <motion.div variants={staggerItem}>
+        <FatigueMonitor />
+      </motion.div>
 
-      <StreakCards />
+      <motion.div variants={staggerItem}>
+        <StreakCards />
+      </motion.div>
 
-      <WorkoutCalendar />
+      <motion.div variants={staggerItem}>
+        <WorkoutCalendar />
+      </motion.div>
 
-      <SummaryStats />
+      {/* Stats section */}
+      <motion.div className="flex flex-col gap-3" variants={staggerItem}>
+        <h2 className="flex items-center gap-2 font-display text-2xl">
+          <BarChart2 size={18} className="text-accent" />
+          Estatísticas
+        </h2>
+        <SummaryStats />
+        <TimeStats />
+      </motion.div>
 
-      <TimeStats />
-
-      <div className="rounded-lg border border-border bg-bg-card p-4">
+      {/* Personal Records */}
+      <motion.div
+        className="rounded-xl border border-border bg-bg-card p-4"
+        variants={staggerItem}
+      >
         <h2 className="mb-3 flex items-center gap-2 font-display text-2xl">
-          <Trophy size={20} className="text-accent" />
+          <Trophy size={18} className="text-accent" />
           {t('progress.records')}
         </h2>
         <motion.div
@@ -68,15 +93,24 @@ export default function Progress() {
           animate="animate"
         >
           <AnimatePresence>
-            {personalRecords.map((pr) => (
+            {personalRecords.map((pr, index) => (
               <motion.div
                 key={pr.exerciseName}
-                className="flex items-center justify-between rounded-lg bg-bg-input px-3 py-2"
+                className="flex items-center justify-between rounded-lg bg-bg-input px-3 py-2.5"
                 variants={staggerItem}
                 exit={{ opacity: 0, x: 20 }}
+                whileHover={{ x: 2 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               >
-                <span className="text-sm text-text-primary">{pr.exerciseName}</span>
-                <span className="text-sm font-medium text-accent">{pr.maxWeight} {t('progress.kg')}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-base leading-none w-5 text-center">
+                    {index < 3 ? MEDALS[index] : '·'}
+                  </span>
+                  <span className="text-sm text-text-primary">{pr.exerciseName}</span>
+                </div>
+                <span className="text-sm font-semibold text-accent tabular-nums">
+                  {pr.maxWeight} {t('progress.kg')}
+                </span>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -84,7 +118,7 @@ export default function Progress() {
             <p className="text-sm text-text-secondary">{t('progress.noRecords')}</p>
           )}
         </motion.div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

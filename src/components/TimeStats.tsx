@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Clock, Timer, Zap } from 'lucide-react'
 import { useWorkoutStats } from '../hooks/useWorkoutStats'
 import { t } from '../i18n'
 import { staggerContainer, staggerItem } from '../lib/motion'
@@ -14,6 +15,12 @@ function formatDuration(min: number): string {
 export default function TimeStats() {
   const { totalTimeMinutes, avgDurationMinutes, longestSessionMinutes } = useWorkoutStats()
 
+  const stats = [
+    { icon: Clock, label: t('stats.totalTime'),       value: formatDuration(totalTimeMinutes)         },
+    { icon: Timer, label: t('stats.avgDuration'),     value: formatDuration(avgDurationMinutes)       },
+    { icon: Zap,   label: t('stats.longestSession'),  value: formatDuration(longestSessionMinutes)    },
+  ]
+
   return (
     <motion.div
       className="grid grid-cols-3 gap-2"
@@ -21,35 +28,24 @@ export default function TimeStats() {
       initial="initial"
       animate="animate"
     >
-      <motion.div
-        className="bg-surface rounded-xl px-3 py-3 flex flex-col gap-0.5 items-center text-center"
-        variants={staggerItem}
-      >
-        <span className="text-xl font-bold text-primary truncate w-full text-center">
-          {formatDuration(totalTimeMinutes)}
-        </span>
-        <span className="text-[10px] text-secondary leading-tight">{t('stats.totalTime')}</span>
-      </motion.div>
-
-      <motion.div
-        className="bg-surface rounded-xl px-3 py-3 flex flex-col gap-0.5 items-center text-center"
-        variants={staggerItem}
-      >
-        <span className="text-xl font-bold text-primary truncate w-full text-center">
-          {formatDuration(avgDurationMinutes)}
-        </span>
-        <span className="text-[10px] text-secondary leading-tight">{t('stats.avgDuration')}</span>
-      </motion.div>
-
-      <motion.div
-        className="bg-surface rounded-xl px-3 py-3 flex flex-col gap-0.5 items-center text-center"
-        variants={staggerItem}
-      >
-        <span className="text-xl font-bold text-primary truncate w-full text-center">
-          {formatDuration(longestSessionMinutes)}
-        </span>
-        <span className="text-[10px] text-secondary leading-tight">{t('stats.longestSession')}</span>
-      </motion.div>
+      {stats.map(({ icon: Icon, label, value }) => (
+        <motion.div
+          key={label}
+          className="bg-bg-card border border-border rounded-xl px-3 py-3 flex flex-col gap-1.5 items-center text-center"
+          variants={staggerItem}
+          whileHover={{ y: -2 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        >
+          <Icon size={14} className="text-accent opacity-80" />
+          <span
+            className="text-2xl font-bold text-text-primary leading-none truncate w-full text-center"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {value}
+          </span>
+          <span className="text-[10px] text-text-secondary leading-tight">{label}</span>
+        </motion.div>
+      ))}
     </motion.div>
   )
 }
