@@ -101,6 +101,66 @@ describe('useWorkoutStore', () => {
     expect(useWorkoutStore.getState().session).toBeNull()
   })
 
+  it('startSession sets fromRoutine: true on all routine entries', () => {
+    useWorkoutStore.getState().startSession([
+      { exerciseId: 'bench-press', sets: 3, reps: 10, weight: 90 },
+      { exerciseId: 'squat', sets: 3, reps: 10, weight: 100 },
+    ])
+    const entries = useWorkoutStore.getState().session!.entries
+    expect(entries[0].fromRoutine).toBe(true)
+    expect(entries[1].fromRoutine).toBe(true)
+  })
+
+  it('addExercise does not set fromRoutine', () => {
+    useWorkoutStore.getState().startSession()
+    useWorkoutStore.getState().addExercise('bench-press')
+    expect(useWorkoutStore.getState().session!.entries[0].fromRoutine).toBeFalsy()
+  })
+
+  it('toggleHideExercise sets hidden: true on a visible entry', () => {
+    useWorkoutStore.getState().startSession([{ exerciseId: 'bench-press', sets: 3, reps: 10, weight: 90 }])
+    useWorkoutStore.getState().toggleHideExercise(0)
+    expect(useWorkoutStore.getState().session!.entries[0].hidden).toBe(true)
+  })
+
+  it('toggleHideExercise sets hidden: false on an already-hidden entry', () => {
+    useWorkoutStore.getState().startSession([{ exerciseId: 'bench-press', sets: 3, reps: 10, weight: 90 }])
+    useWorkoutStore.getState().toggleHideExercise(0)
+    useWorkoutStore.getState().toggleHideExercise(0)
+    expect(useWorkoutStore.getState().session!.entries[0].hidden).toBe(false)
+  })
+
+  it('toggleHideExercise does not remove the entry from the array', () => {
+    useWorkoutStore.getState().startSession([
+      { exerciseId: 'bench-press', sets: 3, reps: 10, weight: 90 },
+      { exerciseId: 'squat', sets: 3, reps: 10, weight: 100 },
+    ])
+    useWorkoutStore.getState().toggleHideExercise(0)
+    expect(useWorkoutStore.getState().session!.entries).toHaveLength(2)
+  })
+
+  it('toggleHideExercise does nothing without an active session', () => {
+    useWorkoutStore.getState().toggleHideExercise(0)
+    expect(useWorkoutStore.getState().session).toBeNull()
+  })
+
+  it('finishWorkout strips hidden entries', () => {
+    useWorkoutStore.getState().startSession([
+      { exerciseId: 'bench-press', sets: 3, reps: 10, weight: 90 },
+      { exerciseId: 'squat', sets: 3, reps: 10, weight: 100 },
+    ])
+    useWorkoutStore.getState().toggleHideExercise(0)
+    const completed = useWorkoutStore.getState().finishWorkout()
+    expect(completed!.entries).toHaveLength(1)
+    expect(completed!.entries[0].exerciseId).toBe('squat')
+  })
+
+  it('finishWorkout keeps non-hidden entries', () => {
+    useWorkoutStore.getState().startSession([{ exerciseId: 'bench-press', sets: 3, reps: 10, weight: 90 }])
+    const completed = useWorkoutStore.getState().finishWorkout()
+    expect(completed!.entries).toHaveLength(1)
+  })
+
   it('removeExercise removes the exercise at the given index', () => {
     useWorkoutStore.getState().startSession()
     useWorkoutStore.getState().addExercise('bench-press')

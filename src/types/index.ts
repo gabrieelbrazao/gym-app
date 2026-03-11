@@ -60,6 +60,8 @@ export interface WorkoutEntry {
   uid?: string
   exerciseId: string
   sets: SetLog[]
+  fromRoutine?: boolean
+  hidden?: boolean
 }
 
 export interface WorkoutSession {

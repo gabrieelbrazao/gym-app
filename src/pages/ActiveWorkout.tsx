@@ -10,7 +10,7 @@ import { exercises as exerciseDb } from '../data/exercises'
 import SetInput from '../components/SetInput'
 import ExercisePicker from '../components/ExercisePicker'
 import RestTimer from '../components/RestTimer'
-import { Plus, CheckCircle, Dumbbell, X } from 'lucide-react'
+import { Plus, CheckCircle, Dumbbell, X, EyeOff, Eye } from 'lucide-react'
 import type { Exercise, SetLog } from '../types'
 import { t } from '../i18n'
 
@@ -21,7 +21,7 @@ function formatTime(s: number) {
 export default function ActiveWorkout() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { session, startSession, addExercise, removeExercise, addSet, updateSet, cancelWorkout, finishWorkout } = useWorkoutStore()
+  const { session, startSession, addExercise, removeExercise, toggleHideExercise, addSet, updateSet, cancelWorkout, finishWorkout } = useWorkoutStore()
   const { saveSession } = useHistoryStore()
   const { routines } = useRoutineStore()
   const [showPicker, setShowPicker] = useState(false)
@@ -121,24 +121,49 @@ export default function ActiveWorkout() {
             key={entry.uid ?? `${entry.exerciseId}-${entryIndex}`}
             className="rounded-lg border border-border bg-bg-card p-4"
             initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={{ opacity: entry.hidden ? 0.4 : 1, x: 0 }}
             exit={{ opacity: 0, x: 24 }}
             transition={{ duration: 0.22 }}
           >
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-display text-xl text-text-primary">
-                {getExerciseName(entry.exerciseId)}
-              </h3>
-              <motion.button
-                onClick={() => removeExercise(entryIndex)}
-                className="rounded p-1 text-text-secondary transition-colors hover:text-red-400"
-                whileTap={{ scale: 0.9 }}
-                title={t('workout.removeExercise')}
-              >
-                <X size={16} />
-              </motion.button>
+              <div className="flex flex-col gap-0.5">
+                <h3 className="font-display text-xl text-text-primary">
+                  {getExerciseName(entry.exerciseId)}
+                </h3>
+                {entry.fromRoutine ? (
+                  <span className="flex items-center gap-1 text-[10px] font-medium text-accent">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
+                    {t('workout.fromRoutineLabel')}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-[10px] font-medium text-text-secondary">
+                    <Plus size={9} />
+                    {t('workout.addedLabel')}
+                  </span>
+                )}
+              </div>
+              {entry.fromRoutine ? (
+                <motion.button
+                  onClick={() => toggleHideExercise(entryIndex)}
+                  className={`rounded p-1 transition-colors ${entry.hidden ? 'text-accent hover:text-text-primary' : 'text-text-secondary hover:text-yellow-400'}`}
+                  whileTap={{ scale: 0.9 }}
+                  title={entry.hidden ? t('workout.showExercise') : t('workout.hideExercise')}
+                >
+                  {entry.hidden ? <Eye size={16} /> : <EyeOff size={16} />}
+                </motion.button>
+              ) : (
+                <motion.button
+                  onClick={() => removeExercise(entryIndex)}
+                  className="rounded p-1 text-text-secondary transition-colors hover:text-red-400"
+                  whileTap={{ scale: 0.9 }}
+                  title={t('workout.removeExercise')}
+                >
+                  <X size={16} />
+                </motion.button>
+              )}
             </div>
 
+            <div className={entry.hidden ? 'pointer-events-none' : undefined}>
             <div className="mb-2 flex gap-3 px-3 text-xs text-text-secondary">
               <span className="w-6">{t('workout.set')}</span>
               <span className="w-16 text-center">{t('workout.kg')}</span>
@@ -174,6 +199,7 @@ export default function ActiveWorkout() {
               <Plus size={14} />
               {t('workout.addSet')}
             </button>
+            </div>
           </motion.div>
         ))}
       </AnimatePresence>

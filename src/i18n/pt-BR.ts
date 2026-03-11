@@ -50,6 +50,10 @@ export const ptBR: Record<string, string> = {
   'workout.addExercise': 'Adicionar Exercício',
   'workout.cancel': 'Cancelar treino',
   'workout.removeExercise': 'Remover exercício',
+  'workout.hideExercise': 'Ocultar exercício',
+  'workout.showExercise': 'Mostrar exercício',
+  'workout.fromRoutineLabel': 'Rotina',
+  'workout.addedLabel': 'Adicionado',
 
   // History
   'history.title': 'Histórico',
