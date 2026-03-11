@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { format } from 'date-fns'
 import type { WorkoutSession, SetLog, RoutineExercise, WorkoutEntry } from '../types'
 import { uuid } from '../lib/dateUtils'
@@ -16,7 +17,9 @@ interface WorkoutStore {
   finishWorkout: () => WorkoutSession | null
 }
 
-export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
+export const useWorkoutStore = create<WorkoutStore>()(
+  persist(
+    (set, get) => ({
   session: null,
 
   startSession: (routineExercises) => {
@@ -134,4 +137,7 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
     set({ session: null })
     return completed
   },
-}))
+}),
+    { name: 'gym-workout' }
+  )
+)

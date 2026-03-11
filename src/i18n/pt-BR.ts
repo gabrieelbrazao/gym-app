@@ -53,6 +53,7 @@ export const ptBR: Record<string, string> = {
   'workout.reorderExercise': 'Reordenar exercício',
   'workout.hideExercise': 'Ocultar exercício',
   'workout.showExercise': 'Mostrar exercício',
+  'workout.returnBanner': 'Treino em andamento',
   'workout.lastTime': 'Última vez',
   'workout.newPR': '🏆 Novo recorde!',
   'workout.fromRoutineLabel': 'Rotina',
@@ -93,6 +94,9 @@ export const ptBR: Record<string, string> = {
   'confirm.deleteRoutineDesc': 'Tem certeza? Esta ação não pode ser desfeita.',
   'confirm.removeExerciseTitle': 'Remover exercício',
   'confirm.removeExerciseDesc': 'Remover este exercício do treino?',
+  'confirm.cancelWorkoutTitle': 'Cancelar treino',
+  'confirm.cancelWorkoutDesc': 'Todo o progresso será perdido. Tem certeza?',
+  'confirm.cancelWorkout': 'Cancelar treino',
 
   // Muscle groups
   'muscle.chest': 'Peito',

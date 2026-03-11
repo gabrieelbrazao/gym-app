@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { format } from 'date-fns'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -179,7 +180,8 @@ export default function ActiveWorkout() {
   const { routines } = useRoutineStore()
   const [showPicker, setShowPicker] = useState(false)
   const [pendingRemoveIndex, setPendingRemoveIndex] = useState<number | null>(null)
-  const elapsed = useStopwatch(!!session)
+  const [confirmCancel, setConfirmCancel] = useState(false)
+  const elapsed = useStopwatch(!!session, session?.startTime)
   const restTimer = useRestTimer()
 
   const sensors = useSensors(
@@ -188,13 +190,23 @@ export default function ActiveWorkout() {
   )
 
   useEffect(() => {
-    cancelWorkout()
     const routineId = (location.state as { routineId?: string } | null)?.routineId
     if (routineId) {
       const routine = routines.find((r) => r.id === routineId)
       if (routine) startSession(routine.exercises)
+    } else if (session) {
+      // stale session from a previous day — discard silently and let user start fresh
+      const today = format(new Date(), 'yyyy-MM-dd')
+      if (session.date !== today) cancelWorkout()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!session) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [!!session])
 
   const getExerciseName = (exerciseId: string) =>
     exerciseDb.find((e) => e.id === exerciseId)?.name ?? exerciseId
@@ -273,14 +285,23 @@ export default function ActiveWorkout() {
           <h1 className="font-display text-4xl">{t('workout.title')}</h1>
           <p className="mt-0.5 font-mono text-sm text-text-secondary">{formatTime(elapsed)}</p>
         </div>
-        <motion.button
-          onClick={handleFinish}
-          className="flex items-center gap-1 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-bg-primary"
-          whileTap={{ scale: 0.95 }}
-        >
-          <CheckCircle size={16} />
-          {t('workout.finish')}
-        </motion.button>
+        <div className="flex items-center gap-2">
+          <motion.button
+            onClick={() => setConfirmCancel(true)}
+            className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary transition-colors hover:border-accent-warm hover:text-accent-warm"
+            whileTap={{ scale: 0.95 }}
+          >
+            <X size={16} />
+          </motion.button>
+          <motion.button
+            onClick={handleFinish}
+            className="flex items-center gap-1 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-bg-primary"
+            whileTap={{ scale: 0.95 }}
+          >
+            <CheckCircle size={16} />
+            {t('workout.finish')}
+          </motion.button>
+        </div>
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -330,6 +351,16 @@ export default function ActiveWorkout() {
           description={t('confirm.removeExerciseDesc')}
           onConfirm={() => { removeExercise(pendingRemoveIndex); setPendingRemoveIndex(null) }}
           onCancel={() => setPendingRemoveIndex(null)}
+        />
+      )}
+
+      {confirmCancel && (
+        <ConfirmDialog
+          title={t('confirm.cancelWorkoutTitle')}
+          description={t('confirm.cancelWorkoutDesc')}
+          confirmLabel={t('confirm.cancelWorkout')}
+          onConfirm={() => { cancelWorkout(); setConfirmCancel(false) }}
+          onCancel={() => setConfirmCancel(false)}
         />
       )}
     </div>
