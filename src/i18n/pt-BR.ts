@@ -53,6 +53,8 @@ export const ptBR: Record<string, string> = {
   'workout.reorderExercise': 'Reordenar exercício',
   'workout.hideExercise': 'Ocultar exercício',
   'workout.showExercise': 'Mostrar exercício',
+  'workout.lastTime': 'Última vez',
+  'workout.newPR': '🏆 Novo recorde!',
   'workout.fromRoutineLabel': 'Rotina',
   'workout.addedLabel': 'Adicionado',
 

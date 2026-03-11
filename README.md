@@ -5,9 +5,11 @@ A workout tracking app built with React. Log exercises, track sets and weights, 
 ## Features
 
 - **202 exercises** organized by muscle group and equipment type
-- **Custom routines** with per-exercise set/rep/weight configuration
+- **Custom routines** with per-exercise set/rep/weight configuration and per-set overrides
 - **Weekly schedule** — assign routines to specific days
 - **Live workout tracking** — log each set as you go, with a rest timer between sets
+- **Drag-to-reorder** — reorder exercises in active workouts and routine editor
+- **Previous session comparison** — ghost values (last weight × reps) shown per set; PR flash + confetti when a personal record is broken
 - **Progress analytics** — streaks, totals, averages, most trained muscles, workout calendar
 - **Muscle fatigue monitor** — tracks recovery status across muscle groups
 - **PWA** — installable, works offline, auto-updates in the background
@@ -20,6 +22,7 @@ A workout tracking app built with React. Log exercises, track sets and weights, 
 | Build | Vite 7 |
 | Styling | Tailwind CSS v4 |
 | Animations | Framer Motion |
+| Drag & Drop | @dnd-kit |
 | State | Zustand (localStorage persistence) |
 | Routing | React Router v7 |
 | Testing | Vitest + React Testing Library |
@@ -48,7 +51,7 @@ npm run lint         # ESLint
 ```
 src/
 ├── pages/           # Dashboard, Exercises, Routines, ActiveWorkout, History, Progress
-├── components/      # Layout, BottomNav, RestTimer, ExercisePicker, WorkoutCalendar, …
+├── components/      # Layout, BottomNav, RestTimer, ExercisePicker, SetInput, ConfirmDialog, …
 ├── stores/          # useWorkoutStore, useHistoryStore, useRoutineStore, useScheduleStore
 ├── hooks/           # useWorkoutStats, useFatigue, useRestTimer, useStopwatch
 ├── data/

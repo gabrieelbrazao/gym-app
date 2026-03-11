@@ -44,6 +44,8 @@ interface SortableCardProps {
   onRemove: (i: number) => void
   onAddSet: (i: number) => void
   onSetChange: (ei: number, si: number, data: Partial<SetLog>) => void
+  previousSets?: { reps: number; weight: number }[]
+  bestWeight: number
 }
 
 function SortableCard({
@@ -54,6 +56,8 @@ function SortableCard({
   onRemove,
   onAddSet,
   onSetChange,
+  previousSets,
+  bestWeight,
 }: SortableCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: entry.uid!,
@@ -145,6 +149,9 @@ function SortableCard({
                     weight={s.weight}
                     completed={s.completed}
                     onChange={(data) => onSetChange(entryIndex, setIndex, data)}
+                    previousWeight={previousSets?.[setIndex]?.weight}
+                    previousReps={previousSets?.[setIndex]?.reps}
+                    isPR={s.completed && s.weight > 0 && s.weight >= bestWeight && bestWeight > 0}
                   />
                 </motion.div>
               ))}
@@ -168,7 +175,7 @@ export default function ActiveWorkout() {
   const navigate = useNavigate()
   const location = useLocation()
   const { session, startSession, addExercise, removeExercise, toggleHideExercise, reorderExercises, addSet, updateSet, cancelWorkout, finishWorkout } = useWorkoutStore()
-  const { saveSession } = useHistoryStore()
+  const { saveSession, getLastEntryForExercise, getBestWeightForExercise } = useHistoryStore()
   const { routines } = useRoutineStore()
   const [showPicker, setShowPicker] = useState(false)
   const [pendingRemoveIndex, setPendingRemoveIndex] = useState<number | null>(null)
@@ -293,6 +300,8 @@ export default function ActiveWorkout() {
                   onRemove={setPendingRemoveIndex}
                   onAddSet={addSet}
                   onSetChange={handleSetChange}
+                  previousSets={getLastEntryForExercise(entry.exerciseId)?.sets}
+                  bestWeight={getBestWeightForExercise(entry.exerciseId)}
                 />
               ))}
             </div>
