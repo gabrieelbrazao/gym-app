@@ -191,7 +191,7 @@ export default function ActiveWorkout() {
 
   useEffect(() => {
     const routineId = (location.state as { routineId?: string } | null)?.routineId
-    if (routineId) {
+    if (routineId && !session) {
       const routine = routines.find((r) => r.id === routineId)
       if (routine) startSession(routine.exercises)
     } else if (session) {

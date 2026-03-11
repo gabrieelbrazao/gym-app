@@ -19,6 +19,11 @@ export const ptBR: Record<string, string> = {
   // Dashboard
   'dashboard.title': 'Painel',
   'dashboard.startWorkout': 'Iniciar Treino',
+  'dashboard.resumeWorkout': 'Continuar treino',
+  'dashboard.newWorkout': 'Novo treino',
+  'dashboard.newWorkoutTitle': 'Iniciar novo treino?',
+  'dashboard.newWorkoutDesc': 'Você tem um treino em andamento. Iniciar um novo vai cancelar o atual.',
+  'dashboard.newWorkoutConfirm': 'Iniciar novo',
   'dashboard.totalWorkouts': 'Total de Treinos',
   'dashboard.totalSets': 'Total de Séries',
   'dashboard.recentWorkouts': 'Treinos Recentes',

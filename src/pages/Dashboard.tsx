@@ -1,28 +1,49 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useHistoryStore } from '../stores/useHistoryStore'
 import { useRoutineStore } from '../stores/useRoutineStore'
 import { useScheduleStore } from '../stores/useScheduleStore'
+import { useWorkoutStore } from '../stores/useWorkoutStore'
 import { exercises as exerciseDb } from '../data/exercises'
-import { Dumbbell, Calendar } from 'lucide-react'
+import { Dumbbell, Calendar, ChevronRight } from 'lucide-react'
 import { t } from '../i18n'
 import { formatDate } from '../lib/formatDate'
 import { staggerContainer, staggerItem, springScale } from '../lib/motion'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const { sessions } = useHistoryStore()
   const { routines } = useRoutineStore()
   const { schedule } = useScheduleStore()
+  const { session, cancelWorkout } = useWorkoutStore()
+  const [pendingNewRoutineId, setPendingNewRoutineId] = useState<string | null>(null)
+  const [confirmNewWorkout, setConfirmNewWorkout] = useState(false)
 
   const todayIndex = new Date().getDay()
   const todayRoutineId = schedule[todayIndex]
   const todayRoutine = todayRoutineId ? routines.find((r) => r.id === todayRoutineId) : null
 
   function handleStartTodayWorkout() {
-    if (todayRoutine) {
+    if (!todayRoutine) return
+    if (session) {
+      setPendingNewRoutineId(todayRoutine.id)
+      setConfirmNewWorkout(true)
+    } else {
       navigate('/workout', { state: { routineId: todayRoutine.id } })
     }
+  }
+
+  function handleConfirmNewWorkout() {
+    cancelWorkout()
+    setConfirmNewWorkout(false)
+    if (pendingNewRoutineId) {
+      navigate('/workout', { state: { routineId: pendingNewRoutineId } })
+    } else {
+      navigate('/workout')
+    }
+    setPendingNewRoutineId(null)
   }
 
   const totalWorkouts = sessions.length
@@ -43,15 +64,36 @@ export default function Dashboard() {
     <div className="flex flex-col gap-6">
       <h1 className="font-display text-4xl">{t('dashboard.title')}</h1>
 
-      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-        <Link
-          to="/workout"
-          className="flex items-center justify-center gap-2 rounded-lg bg-accent py-4 text-lg font-medium text-bg-primary"
-        >
-          <Dumbbell size={22} />
-          {t('dashboard.startWorkout')}
-        </Link>
-      </motion.div>
+      {session ? (
+        <div className="flex flex-col gap-2">
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+            <Link
+              to="/workout"
+              className="flex items-center justify-center gap-2 rounded-lg bg-accent py-4 text-lg font-medium text-bg-primary"
+            >
+              <ChevronRight size={22} />
+              {t('dashboard.resumeWorkout')}
+            </Link>
+          </motion.div>
+          <motion.button
+            onClick={() => { setPendingNewRoutineId(null); setConfirmNewWorkout(true) }}
+            className="py-2 text-sm text-text-secondary transition-colors hover:text-text-primary"
+            whileTap={{ scale: 0.97 }}
+          >
+            {t('dashboard.newWorkout')}
+          </motion.button>
+        </div>
+      ) : (
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+          <Link
+            to="/workout"
+            className="flex items-center justify-center gap-2 rounded-lg bg-accent py-4 text-lg font-medium text-bg-primary"
+          >
+            <Dumbbell size={22} />
+            {t('dashboard.startWorkout')}
+          </Link>
+        </motion.div>
+      )}
 
       <motion.div
         className="grid grid-cols-2 gap-3"
@@ -115,17 +157,17 @@ export default function Dashboard() {
             animate="animate"
           >
             <AnimatePresence>
-              {recentSessions.map((session) => (
-                <motion.div key={session.id} variants={staggerItem}>
+              {recentSessions.map((s) => (
+                <motion.div key={s.id} variants={staggerItem}>
                   <Link
-                    to={`/history/${session.id}`}
+                    to={`/history/${s.id}`}
                     className="block rounded-lg border border-border bg-bg-card p-3 transition-colors hover:border-accent/50"
                   >
                     <p className="flex items-center gap-2 text-sm text-text-primary">
                       <Calendar size={14} className="text-text-secondary" />
-                      {formatDate(session.date)}
+                      {formatDate(s.date)}
                     </p>
-                    <p className="mt-0.5 text-xs text-text-secondary">{getExerciseNames(session)}</p>
+                    <p className="mt-0.5 text-xs text-text-secondary">{getExerciseNames(s)}</p>
                   </Link>
                 </motion.div>
               ))}
@@ -133,6 +175,16 @@ export default function Dashboard() {
           </motion.div>
         )}
       </div>
+
+      {confirmNewWorkout && (
+        <ConfirmDialog
+          title={t('dashboard.newWorkoutTitle')}
+          description={t('dashboard.newWorkoutDesc')}
+          confirmLabel={t('dashboard.newWorkoutConfirm')}
+          onConfirm={handleConfirmNewWorkout}
+          onCancel={() => { setConfirmNewWorkout(false); setPendingNewRoutineId(null) }}
+        />
+      )}
     </div>
   )
 }
