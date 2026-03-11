@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Dumbbell, ClipboardList, TrendingUp } from 'lucide-react'
+import { Home, Dumbbell, ClipboardList, TrendingUp, Settings } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { t } from '../i18n'
 
@@ -8,6 +8,7 @@ const navItems = [
   { to: '/exercises', icon: Dumbbell, label: t('nav.exercises') },
   { to: '/routines', icon: ClipboardList, label: t('nav.routines') },
   { to: '/progress', icon: TrendingUp, label: t('nav.progress') },
+  { to: '/settings', icon: Settings, label: t('nav.settings') },
 ]
 
 export default function BottomNav() {

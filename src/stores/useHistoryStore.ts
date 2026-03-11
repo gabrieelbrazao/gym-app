@@ -8,6 +8,7 @@ interface HistoryStore {
   getSessionById: (id: string) => WorkoutSession | undefined
   getLastEntryForExercise: (exerciseId: string) => { sets: { reps: number; weight: number }[] } | undefined
   getBestWeightForExercise: (exerciseId: string) => number
+  reset: () => void
 }
 
 export const useHistoryStore = create<HistoryStore>()(
@@ -34,6 +35,8 @@ export const useHistoryStore = create<HistoryStore>()(
         }
         return undefined
       },
+
+      reset: () => set({ sessions: [] }),
 
       getBestWeightForExercise: (exerciseId) => {
         let best = 0

@@ -15,6 +15,7 @@ interface WorkoutStore {
   reorderExercises: (entries: WorkoutEntry[]) => void
   cancelWorkout: () => void
   finishWorkout: () => WorkoutSession | null
+  reset: () => void
 }
 
 export const useWorkoutStore = create<WorkoutStore>()(
@@ -121,6 +122,7 @@ export const useWorkoutStore = create<WorkoutStore>()(
   },
 
   cancelWorkout: () => set({ session: null }),
+  reset: () => set({ session: null }),
 
   finishWorkout: () => {
     const session = get().session

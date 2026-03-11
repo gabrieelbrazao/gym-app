@@ -9,6 +9,7 @@ interface RoutineStore {
   updateRoutine: (id: string, data: Partial<Pick<Routine, 'name' | 'exercises'>>) => void
   deleteRoutine: (id: string) => void
   getRoutineById: (id: string) => Routine | undefined
+  reset: () => void
 }
 
 export const useRoutineStore = create<RoutineStore>()(
@@ -43,6 +44,8 @@ export const useRoutineStore = create<RoutineStore>()(
       getRoutineById: (id) => {
         return get().routines.find((r) => r.id === id)
       },
+
+      reset: () => set({ routines: [] }),
     }),
     { name: 'gym-routines' }
   )

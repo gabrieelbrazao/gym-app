@@ -12,10 +12,10 @@ function renderNav(initialRoute = '/') {
 }
 
 describe('BottomNav', () => {
-  it('renders four navigation items', () => {
+  it('renders five navigation items', () => {
     renderNav()
     const links = screen.getAllByRole('link')
-    expect(links).toHaveLength(4)
+    expect(links).toHaveLength(5)
   })
 
   it('renders correct labels', () => {
@@ -24,6 +24,7 @@ describe('BottomNav', () => {
     expect(screen.getByText('Exercícios')).toBeInTheDocument()
     expect(screen.getByText('Rotinas')).toBeInTheDocument()
     expect(screen.getByText('Progresso')).toBeInTheDocument()
+    expect(screen.getByText('Config')).toBeInTheDocument()
   })
 
   it('links to correct routes', () => {
@@ -32,6 +33,7 @@ describe('BottomNav', () => {
     expect(screen.getByText('Exercícios').closest('a')).toHaveAttribute('href', '/exercises')
     expect(screen.getByText('Rotinas').closest('a')).toHaveAttribute('href', '/routines')
     expect(screen.getByText('Progresso').closest('a')).toHaveAttribute('href', '/progress')
+    expect(screen.getByText('Config').closest('a')).toHaveAttribute('href', '/settings')
   })
 
   it('highlights active route', () => {

@@ -4,6 +4,17 @@ export const ptBR: Record<string, string> = {
   'nav.exercises': 'Exercícios',
   'nav.routines': 'Rotinas',
   'nav.progress': 'Progresso',
+  'nav.settings': 'Config',
+
+  // Settings
+  'settings.title': 'Configurações',
+  'settings.dangerZone': 'Zona de perigo',
+  'settings.resetTitle': 'Redefinição de fábrica',
+  'settings.resetDesc': 'Remove todos os treinos, histórico, rotinas e agendamentos. Esta ação não pode ser desfeita.',
+  'settings.resetButton': 'Redefinir tudo',
+  'confirm.resetTitle': 'Redefinir tudo?',
+  'confirm.resetDesc': 'Todo o histórico, rotinas e treinos serão apagados permanentemente.',
+  'confirm.resetConfirm': 'Redefinir',
 
   // Dashboard
   'dashboard.title': 'Painel',

@@ -8,6 +8,7 @@ import ActiveWorkout from './pages/ActiveWorkout'
 import WorkoutHistory from './pages/WorkoutHistory'
 import WorkoutDetail from './pages/WorkoutDetail'
 import Progress from './pages/Progress'
+import Settings from './pages/Settings'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/history" element={<WorkoutHistory />} />
           <Route path="/history/:id" element={<WorkoutDetail />} />
           <Route path="/progress" element={<Progress />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>
