@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { format } from 'date-fns'
-import type { WorkoutSession, SetLog, RoutineExercise } from '../types'
+import type { WorkoutSession, SetLog, RoutineExercise, WorkoutEntry } from '../types'
 import { uuid } from '../lib/dateUtils'
 
 interface WorkoutStore {
@@ -11,6 +11,7 @@ interface WorkoutStore {
   toggleHideExercise: (entryIndex: number) => void
   addSet: (entryIndex: number) => void
   updateSet: (entryIndex: number, setIndex: number, data: Partial<SetLog>) => void
+  reorderExercises: (entries: WorkoutEntry[]) => void
   cancelWorkout: () => void
   finishWorkout: () => WorkoutSession | null
 }
@@ -105,6 +106,13 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
         )
         return { ...entry, sets }
       })
+      return { session: { ...state.session, entries } }
+    })
+  },
+
+  reorderExercises: (entries) => {
+    set((state) => {
+      if (!state.session) return state
       return { session: { ...state.session, entries } }
     })
   },

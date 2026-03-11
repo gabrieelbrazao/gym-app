@@ -35,6 +35,7 @@ export interface Exercise {
 }
 
 export interface RoutineExercise {
+  uid?: string
   exerciseId: string
   sets: number
   reps: number

@@ -210,4 +210,21 @@ describe('useWorkoutStore', () => {
     const result = useWorkoutStore.getState().finishWorkout()
     expect(result).toBeNull()
   })
+
+  it('reorderExercises changes the order of entries', () => {
+    useWorkoutStore.getState().startSession([
+      { exerciseId: 'bench-press', sets: 3, reps: 10, weight: 90 },
+      { exerciseId: 'squat', sets: 3, reps: 10, weight: 100 },
+    ])
+    const entries = useWorkoutStore.getState().session!.entries
+    useWorkoutStore.getState().reorderExercises([entries[1], entries[0]])
+    const reordered = useWorkoutStore.getState().session!.entries
+    expect(reordered[0].exerciseId).toBe('squat')
+    expect(reordered[1].exerciseId).toBe('bench-press')
+  })
+
+  it('reorderExercises does nothing without an active session', () => {
+    useWorkoutStore.getState().reorderExercises([])
+    expect(useWorkoutStore.getState().session).toBeNull()
+  })
 })

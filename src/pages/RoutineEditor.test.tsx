@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { describe, it, expect, beforeEach } from 'vitest'
@@ -69,9 +69,7 @@ describe('RoutineEditor', () => {
     await user.click(screen.getByText('Adicionar Exercício'))
     await user.click(screen.getByText('Supino Reto'))
 
-    const nameEl = screen.getByText('Supino Reto')
-    const headerDiv = nameEl.parentElement!
-    const deleteBtn = within(headerDiv).getByRole('button')
+    const deleteBtn = screen.getByLabelText('Remover exercício')
     await user.click(deleteBtn)
 
     expect(screen.queryByText('Supino Reto')).not.toBeInTheDocument()
@@ -152,5 +150,17 @@ describe('RoutineEditor', () => {
     // close
     await user.click(screen.getByText('Por série'))
     expect(screen.getAllByText('Reps')).toHaveLength(1)
+  })
+
+  it('renders a drag handle for each added exercise', async () => {
+    const user = userEvent.setup()
+    renderEditor()
+
+    await user.click(screen.getByText('Adicionar Exercício'))
+    await user.click(screen.getByText('Supino Reto'))
+    await user.click(screen.getByText('Adicionar Exercício'))
+    await user.click(screen.getByText('Agachamento'))
+
+    expect(screen.getAllByLabelText('Reordenar exercício')).toHaveLength(2)
   })
 })
