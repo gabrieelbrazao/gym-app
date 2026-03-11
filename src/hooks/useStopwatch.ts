@@ -1,19 +1,26 @@
-import { useState, useEffect, useRef } from 'react'
+import { useReducer, useEffect, useRef } from 'react'
+
+type State = { seconds: number; startTime: number }
+type Action = { type: 'start'; startTime: number } | { type: 'tick' }
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'start':
+      return { seconds: 0, startTime: action.startTime }
+    case 'tick':
+      return { ...state, seconds: Math.floor((Date.now() - state.startTime) / 1000) }
+  }
+}
 
 export function useStopwatch(active: boolean): number {
-  const [seconds, setSeconds] = useState(0)
+  const [{ seconds }, dispatch] = useReducer(reducer, { seconds: 0, startTime: 0 })
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startRef = useRef<number>(0)
 
   useEffect(() => {
     if (active) {
-      startRef.current = Date.now()
-      setSeconds(0)
+      dispatch({ type: 'start', startTime: Date.now() })
 
-      const tick = () => {
-        setSeconds(Math.floor((Date.now() - startRef.current) / 1000))
-      }
-
+      const tick = () => dispatch({ type: 'tick' })
       intervalRef.current = setInterval(tick, 1000)
 
       const onVisibilityChange = () => {

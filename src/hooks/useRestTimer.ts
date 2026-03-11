@@ -31,7 +31,7 @@ export function useRestTimer(): RestTimerState {
       clearTimer()
       setIsRunning(false)
       setRemaining(0)
-      try { navigator.vibrate(200) } catch {}
+
     } else {
       setRemaining(left)
     }

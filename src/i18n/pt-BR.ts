@@ -49,6 +49,7 @@ export const ptBR: Record<string, string> = {
   'workout.addSet': 'Adicionar Série',
   'workout.addExercise': 'Adicionar Exercício',
   'workout.cancel': 'Cancelar treino',
+  'workout.removeExercise': 'Remover exercício',
 
   // History
   'history.title': 'Histórico',

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 
 interface NumericInputProps {
   value: number
@@ -14,12 +14,15 @@ interface NumericInputProps {
  */
 export default function NumericInput({ value, onChange, min = 0, className, 'aria-label': ariaLabel }: NumericInputProps) {
   const [str, setStr] = useState(String(value))
-  const focusedRef = useRef(false)
+  const [lastSyncedValue, setLastSyncedValue] = useState(value)
+  const [focused, setFocused] = useState(false)
 
-  // sync from parent only when the field is not focused
-  useEffect(() => {
-    if (!focusedRef.current) setStr(String(value))
-  }, [value])
+  // sync from parent when value changes and field is not focused
+  // (getDerivedStateFromProps pattern — calling setState during render is safe here)
+  if (value !== lastSyncedValue) {
+    setLastSyncedValue(value)
+    if (!focused) setStr(String(value))
+  }
 
   return (
     <input
@@ -29,9 +32,9 @@ export default function NumericInput({ value, onChange, min = 0, className, 'ari
       aria-label={ariaLabel}
       className={className}
       onChange={(e) => setStr(e.target.value)}
-      onFocus={(e) => { focusedRef.current = true; e.target.select() }}
+      onFocus={(e) => { setFocused(true); e.target.select() }}
       onBlur={() => {
-        focusedRef.current = false
+        setFocused(false)
         const n = parseFloat(str)
         const final = isNaN(n) ? 0 : Math.max(min, n)
         onChange(final)

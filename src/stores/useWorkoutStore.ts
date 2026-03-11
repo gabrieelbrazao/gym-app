@@ -7,6 +7,7 @@ interface WorkoutStore {
   session: WorkoutSession | null
   startSession: (routineExercises?: RoutineExercise[]) => void
   addExercise: (exerciseId: string) => void
+  removeExercise: (entryIndex: number) => void
   addSet: (entryIndex: number) => void
   updateSet: (entryIndex: number, setIndex: number, data: Partial<SetLog>) => void
   cancelWorkout: () => void
@@ -19,6 +20,7 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
   startSession: (routineExercises) => {
     const entries = routineExercises
       ? routineExercises.map((re) => ({
+          uid: uuid(),
           exerciseId: re.exerciseId,
           sets: Array.from({ length: re.sets }, (_, i) => ({
             reps: re.repsPerSet?.[i] ?? re.reps,
@@ -47,8 +49,20 @@ export const useWorkoutStore = create<WorkoutStore>()((set, get) => ({
           ...state.session,
           entries: [
             ...state.session.entries,
-            { exerciseId, sets: [{ reps: 0, weight: 0, completed: false }] },
+            { uid: uuid(), exerciseId, sets: [{ reps: 0, weight: 0, completed: false }] },
           ],
+        },
+      }
+    })
+  },
+
+  removeExercise: (entryIndex) => {
+    set((state) => {
+      if (!state.session) return state
+      return {
+        session: {
+          ...state.session,
+          entries: state.session.entries.filter((_, i) => i !== entryIndex),
         },
       }
     })

@@ -57,6 +57,7 @@ export interface SetLog {
 }
 
 export interface WorkoutEntry {
+  uid?: string
   exerciseId: string
   sets: SetLog[]
 }

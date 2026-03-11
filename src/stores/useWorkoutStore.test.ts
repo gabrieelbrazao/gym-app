@@ -101,6 +101,35 @@ describe('useWorkoutStore', () => {
     expect(useWorkoutStore.getState().session).toBeNull()
   })
 
+  it('removeExercise removes the exercise at the given index', () => {
+    useWorkoutStore.getState().startSession()
+    useWorkoutStore.getState().addExercise('bench-press')
+    useWorkoutStore.getState().addExercise('squat')
+    useWorkoutStore.getState().removeExercise(0)
+
+    const entries = useWorkoutStore.getState().session!.entries
+    expect(entries).toHaveLength(1)
+    expect(entries[0].exerciseId).toBe('squat')
+  })
+
+  it('removeExercise removes only the targeted exercise', () => {
+    useWorkoutStore.getState().startSession()
+    useWorkoutStore.getState().addExercise('bench-press')
+    useWorkoutStore.getState().addExercise('squat')
+    useWorkoutStore.getState().addExercise('deadlift')
+    useWorkoutStore.getState().removeExercise(1)
+
+    const entries = useWorkoutStore.getState().session!.entries
+    expect(entries).toHaveLength(2)
+    expect(entries[0].exerciseId).toBe('bench-press')
+    expect(entries[1].exerciseId).toBe('deadlift')
+  })
+
+  it('removeExercise does nothing without an active session', () => {
+    useWorkoutStore.getState().removeExercise(0)
+    expect(useWorkoutStore.getState().session).toBeNull()
+  })
+
   it('cancelWorkout clears the session', () => {
     useWorkoutStore.getState().startSession()
     useWorkoutStore.getState().cancelWorkout()

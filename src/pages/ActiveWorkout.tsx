@@ -10,7 +10,7 @@ import { exercises as exerciseDb } from '../data/exercises'
 import SetInput from '../components/SetInput'
 import ExercisePicker from '../components/ExercisePicker'
 import RestTimer from '../components/RestTimer'
-import { Plus, CheckCircle, Dumbbell } from 'lucide-react'
+import { Plus, CheckCircle, Dumbbell, X } from 'lucide-react'
 import type { Exercise, SetLog } from '../types'
 import { t } from '../i18n'
 
@@ -21,7 +21,7 @@ function formatTime(s: number) {
 export default function ActiveWorkout() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { session, startSession, addExercise, addSet, updateSet, cancelWorkout, finishWorkout } = useWorkoutStore()
+  const { session, startSession, addExercise, removeExercise, addSet, updateSet, cancelWorkout, finishWorkout } = useWorkoutStore()
   const { saveSession } = useHistoryStore()
   const { routines } = useRoutineStore()
   const [showPicker, setShowPicker] = useState(false)
@@ -35,7 +35,7 @@ export default function ActiveWorkout() {
       const routine = routines.find((r) => r.id === routineId)
       if (routine) startSession(routine.exercises)
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const getExerciseName = (exerciseId: string) =>
     exerciseDb.find((e) => e.id === exerciseId)?.name ?? exerciseId
@@ -118,17 +118,25 @@ export default function ActiveWorkout() {
       <AnimatePresence>
         {session.entries.map((entry, entryIndex) => (
           <motion.div
-            key={`${entry.exerciseId}-${entryIndex}`}
+            key={entry.uid ?? `${entry.exerciseId}-${entryIndex}`}
             className="rounded-lg border border-border bg-bg-card p-4"
             initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 24 }}
             transition={{ duration: 0.22 }}
           >
-            <div className="mb-3">
+            <div className="mb-3 flex items-center justify-between">
               <h3 className="font-display text-xl text-text-primary">
                 {getExerciseName(entry.exerciseId)}
               </h3>
+              <motion.button
+                onClick={() => removeExercise(entryIndex)}
+                className="rounded p-1 text-text-secondary transition-colors hover:text-red-400"
+                whileTap={{ scale: 0.9 }}
+                title={t('workout.removeExercise')}
+              >
+                <X size={16} />
+              </motion.button>
             </div>
 
             <div className="mb-2 flex gap-3 px-3 text-xs text-text-secondary">
