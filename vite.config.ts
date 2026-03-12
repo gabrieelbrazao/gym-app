@@ -59,6 +59,18 @@ export default defineConfig({
     setupFiles: './src/__tests__/setup.ts',
     css: true,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor':     ['react', 'react-dom', 'react-router-dom'],
+          'framer-motion':    ['framer-motion'],
+          'body-highlighter': ['react-body-highlighter'],
+          'icons':            ['lucide-react'],
+        },
+      },
+    },
+  },
   server: {
     allowedHosts: true,
   },
