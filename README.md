@@ -4,16 +4,28 @@ A workout tracking app built with React. Log exercises, track sets and weights, 
 
 **[Live demo →](https://gabrieelbrazao.github.io/gym-app/)** — installable as a PWA; all data stays in your browser.
 
-<p align="center">
-  <img src="docs/screenshots/dashboard.png" width="30%" alt="Dashboard with streak, totals and today's scheduled routine" />
-  <img src="docs/screenshots/workout.png" width="30%" alt="Active workout with per-set logging and PR flash" />
-  <img src="docs/screenshots/progress.png" width="30%" alt="Progress page with muscle fatigue monitor and workout calendar" />
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/routines.png" width="30%" alt="Routines and weekly schedule" />
-  <img src="docs/screenshots/exercises.png" width="30%" alt="Exercise library with muscle group filter" />
-</p>
+<table>
+  <tr>
+    <td><img src="docs/screenshots/dashboard.png" alt="Dashboard with totals and today's scheduled routine" /></td>
+    <td><img src="docs/screenshots/workout.png" alt="Active workout with per-set logging and PR flash" /></td>
+    <td><img src="docs/screenshots/progress.png" alt="Muscle fatigue monitor and streak cards" /></td>
+  </tr>
+  <tr>
+    <td align="center">Dashboard</td>
+    <td align="center">Active workout</td>
+    <td align="center">Progress</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/routines.png" alt="Routines and weekly schedule" /></td>
+    <td><img src="docs/screenshots/exercises.png" alt="Exercise library with muscle group filter" /></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td align="center">Routines &amp; weekly schedule</td>
+    <td align="center">Exercise library</td>
+    <td></td>
+  </tr>
+</table>
 
 ## Features
 
