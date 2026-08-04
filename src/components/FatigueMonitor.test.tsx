@@ -3,6 +3,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import FatigueMonitor from './FatigueMonitor'
 import { useHistoryStore } from '../stores/useHistoryStore'
 
+// Fix "today" so tests are date-independent
+const TODAY = '2026-03-10'
+vi.setSystemTime(new Date(TODAY + 'T12:00:00'))
+
 // react-body-highlighter renders a complex SVG; mock it to keep tests fast
 vi.mock('react-body-highlighter', () => ({
   default: ({ onClick }: { onClick?: (s: { muscle: string; data: { exercises: string[]; frequency: number } }) => void }) => (
@@ -55,7 +59,7 @@ describe('FatigueMonitor', () => {
   it('shows "Fatigado" in detail card for a muscle trained today', () => {
     useHistoryStore.getState().saveSession({
       id: 's1',
-      date: '2026-03-10',
+      date: TODAY,
       status: 'completed',
       entries: [{ exerciseId: 'bench-press', sets: [{ reps: 10, weight: 60, completed: true }] }],
     })
