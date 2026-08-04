@@ -1,8 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import WorkoutCalendar from './WorkoutCalendar'
 import { useHistoryStore } from '../stores/useHistoryStore'
+
+// Fix "today" so tests are date-independent
+const TODAY = '2026-03-10'
+vi.setSystemTime(new Date(TODAY + 'T12:00:00'))
 
 describe('WorkoutCalendar', () => {
   beforeEach(() => {

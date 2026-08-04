@@ -4,7 +4,11 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 
+// GitHub Pages serves this repo from /gym-app/; local dev and other hosts stay at the root.
+const base = process.env.GITHUB_PAGES ? '/gym-app/' : '/'
+
 export default defineConfig({
+  base,
   plugins: [
     basicSsl(),
     react(),
@@ -20,7 +24,7 @@ export default defineConfig({
         background_color: '#14141F',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
+        start_url: base,
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
@@ -29,7 +33,7 @@ export default defineConfig({
       workbox: {
         clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        navigateFallback: '/index.html',
+        navigateFallback: base + 'index.html',
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {

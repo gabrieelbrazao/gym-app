@@ -2,6 +2,19 @@
 
 A workout tracking app built with React. Log exercises, track sets and weights, monitor streaks, and analyze progress over time.
 
+**[Live demo →](https://gabrieelbrazao.github.io/gym-app/)** — installable as a PWA; all data stays in your browser.
+
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" width="30%" alt="Dashboard with streak, totals and today's scheduled routine" />
+  <img src="docs/screenshots/workout.png" width="30%" alt="Active workout with per-set logging and PR flash" />
+  <img src="docs/screenshots/progress.png" width="30%" alt="Progress page with muscle fatigue monitor and workout calendar" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/routines.png" width="30%" alt="Routines and weekly schedule" />
+  <img src="docs/screenshots/exercises.png" width="30%" alt="Exercise library with muscle group filter" />
+</p>
+
 ## Features
 
 - **202 exercises** organized by muscle group and equipment type
@@ -77,3 +90,11 @@ src/
 | `/history` | Past sessions |
 | `/history/:id` | Session detail |
 | `/progress` | Analytics and charts |
+
+## Deploy
+
+Pushes to `main` build with `GITHUB_PAGES=1` (which sets the `/gym-app/` base path) and publish to GitHub Pages via `.github/workflows/deploy.yml`.
+
+## License
+
+[MIT](LICENSE)
